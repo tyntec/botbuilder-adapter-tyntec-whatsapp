@@ -1,17 +1,24 @@
 {
   "name": "botbuilder-adapter-tyntec-whatsapp",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A Microsoft Bot Framework adapter for handling connectivity with the WhatsApp channel in tyntec Conversations API.",
   "keywords": ["Microsoft Bot Framework", "tyntec", "WhatsApp"],
   "license": "MIT",
   "author": "tyntec GmbH",
   "files": ["lib/**/*"],
+  "main": "./lib/index.js",
   "typings": "./lib/index.d.ts",
   "repository": "github:tyntec/botbuilder-adapter-tyntec-whatsapp",
   "scripts": {
     "build": "tsc --build"
   },
+  "dependencies": {
+    "botbuilder": "^4.8.0"
+  },
   "devDependencies": {
     "typescript": "^4.3.5"
+  },
+  "engines": {
+    "node": ">=14"
   }
 }
