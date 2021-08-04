@@ -5,5 +5,13 @@
   "keywords": ["Microsoft Bot Framework", "tyntec", "WhatsApp"],
   "license": "MIT",
   "author": "tyntec GmbH",
-  "repository": "github:tyntec/botbuilder-adapter-tyntec-whatsapp"
+  "files": ["lib/**/*"],
+  "typings": "./lib/index.d.ts",
+  "repository": "github:tyntec/botbuilder-adapter-tyntec-whatsapp",
+  "scripts": {
+    "build": "tsc --build"
+  },
+  "devDependencies": {
+    "typescript": "^4.3.5"
+  }
 }
