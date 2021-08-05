@@ -2,7 +2,11 @@ export interface ITyntecWhatsAppMessage {
     from: string;
     to: string;
     channel: "whatsapp";
-    content: ITyntecWhatsAppTemplateContent;
+    content: ITyntecWhatsAppTemplateContent | ITyntecWhatsAppTextContent;
+}
+
+export interface ITyntecWhatsAppMessageEvent extends ITyntecWhatsAppMessage {
+    event: "MoMessage"
 }
 
 export interface ITyntecWhatsAppTemplate {
@@ -22,5 +26,10 @@ export interface ITyntecWhatsAppTemplateContent {
 
 export interface ITyntecWhatsAppTemplateTextBodyComponent {
     type: "text";
+    text: string;
+}
+
+export interface ITyntecWhatsAppTextContent {
+    contentType: "text";
     text: string;
 }

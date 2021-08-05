@@ -1,5 +1,5 @@
-import {Activity, ActivityTypes, BotAdapter, ConversationReference, MessageFactory, ResourceResponse, TurnContext, WebRequest, WebResponse} from "botbuilder";
-import {ITyntecWhatsAppMessage} from "./tyntec/messages";
+import {Activity, ActivityTypes, BotAdapter, ConversationReference, ResourceResponse, TurnContext, WebRequest, WebResponse} from "botbuilder";
+import {ITyntecWhatsAppMessage, ITyntecWhatsAppMessageEvent} from "./tyntec/messages";
 import {TyntecClient} from "./tyntec/client";
 
 export interface ITyntecWhatsAppAdapterSettings {
@@ -27,7 +27,26 @@ export class TyntecWhatsAppAdapter extends BotAdapter {
     }
 
     async processActivity(req: WebRequest, res: WebResponse, logic: (context: TurnContext) => Promise<any>): Promise<void> {
-        throw Error("Operation processActivity not supported.");
+        const requestBody = await new Promise((resolve: (value: ITyntecWhatsAppMessageEvent) => void) => {
+            if (req.body !== undefined) {
+                return resolve(req.body);
+            }
+
+            let requestJson = '';
+            req.on!('data', (chunk: string) => {
+                requestJson += chunk;
+            });
+            req.on!('end', (): void => {
+                resolve(JSON.parse(requestJson));
+            });
+        });
+
+        const activity = this.parseTyntecWhatsAppMessageEvent(requestBody);
+        const context = new TurnContext(this as any, activity);
+        await this.runMiddleware(context, logic);
+
+        res.status(200);
+        res.end();
     }
 
     async sendActivities(context: TurnContext, activities: Partial<Activity>[]): Promise<ResourceResponse[]> {
@@ -160,6 +179,22 @@ export class TyntecWhatsAppAdapter extends BotAdapter {
                 contentType: "template",
                 template: activity.channelData.template
             }
+        };
+    }
+
+    protected parseTyntecWhatsAppMessageEvent(event: ITyntecWhatsAppMessageEvent): Partial<Activity> {
+        if (event.event !== "MoMessage") {
+            throw Error(`TyntecWhatsAppAdapter: ITyntecWhatsAppMessageEvent.event other than MoMessage not supported: ${event.event}`)
+        }
+        if (event.content.contentType !== "text") {
+            throw Error(`TyntecWhatsAppAdapter: ITyntecWhatsAppMessageEvent.content.contentType other than text not supported: ${event.content.contentType}`)
+        }
+        return {
+            channelData: {
+                whatsApp: event.from
+            },
+            text: event.content.text,
+            type: ActivityTypes.Message,
         };
     }
 }
