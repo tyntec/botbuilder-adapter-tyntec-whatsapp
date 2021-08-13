@@ -1,5 +1,5 @@
 import {Activity, ActivityTypes, BotAdapter, ConversationReference, ResourceResponse, TextFormatTypes, TurnContext, WebRequest, WebResponse} from "botbuilder";
-import {ITyntecWhatsAppMessage, ITyntecWhatsAppMessageEvent} from "./tyntec/messages";
+import {ITyntecMoMessage, ITyntecWhatsAppMessageRequest} from "./tyntec/messages";
 import {TyntecClient} from "./tyntec/client";
 
 export interface ITyntecWhatsAppAdapterSettings {
@@ -27,7 +27,7 @@ export class TyntecWhatsAppAdapter extends BotAdapter {
     }
 
     async processActivity(req: WebRequest, res: WebResponse, logic: (context: TurnContext) => Promise<any>): Promise<void> {
-        const requestBody = await new Promise((resolve: (value: ITyntecWhatsAppMessageEvent) => void) => {
+        const requestBody = await new Promise((resolve: (value: ITyntecMoMessage) => void) => {
             if (req.body !== undefined) {
                 return resolve(req.body);
             }
@@ -41,7 +41,7 @@ export class TyntecWhatsAppAdapter extends BotAdapter {
             });
         });
 
-        const activity = this.parseTyntecWhatsAppMessageEvent(requestBody);
+        const activity = await this.parseTyntecWhatsAppMessageEvent(requestBody);
         const context = new TurnContext(this as any, activity);
         await this.runMiddleware(context, logic);
 
@@ -52,9 +52,9 @@ export class TyntecWhatsAppAdapter extends BotAdapter {
     async sendActivities(context: TurnContext, activities: Partial<Activity>[]): Promise<ResourceResponse[]> {
         const responses: ResourceResponse[] = [];
         for (const activity of activities) {
-            const message = this.composeTyntecWhatsAppMessage(activity);
+            const request = this.composeTyntecWhatsAppMessageRequest(activity);
 
-            const messageId = await this.tyntecClient.sendWhatsAppMessage(message);
+            const messageId = await this.tyntecClient.sendWhatsAppMessage(request);
 
             responses.push({id: messageId});
         }
@@ -65,7 +65,7 @@ export class TyntecWhatsAppAdapter extends BotAdapter {
         throw Error("Operation updateActivity not supported.");
     }
 
-    protected composeTyntecWhatsAppMessage(activity: Partial<Activity>): ITyntecWhatsAppMessage {
+    protected composeTyntecWhatsAppMessageRequest(activity: Partial<Activity>): ITyntecWhatsAppMessageRequest {
         if (activity.action !== undefined) {
             console.warn(`TyntecWhatsAppAdapter: Activity.action not supported: ${activity.action}`);
         }
@@ -240,19 +240,40 @@ export class TyntecWhatsAppAdapter extends BotAdapter {
         throw Error(`TyntecWhatsAppAdapter: invalid input: ${activity}`);
     }
 
-    protected parseTyntecWhatsAppMessageEvent(event: ITyntecWhatsAppMessageEvent): Partial<Activity> {
+    protected async parseTyntecWhatsAppMessageEvent(event: ITyntecMoMessage): Promise<Partial<Activity>> {
         if (event.event !== "MoMessage") {
-            throw Error(`TyntecWhatsAppAdapter: ITyntecWhatsAppMessageEvent.event other than MoMessage not supported: ${event.event}`)
+            throw Error(`TyntecWhatsAppAdapter: ITyntecMoMessage.event other than MoMessage not supported: ${event.event}`)
         }
-        if (event.content.contentType !== "text") {
-            throw Error(`TyntecWhatsAppAdapter: ITyntecWhatsAppMessageEvent.content.contentType other than text not supported: ${event.content.contentType}`)
+        if (event.content.contentType === "media" && event.content.media.type !== "image") {
+            throw Error(`TyntecWhatsAppAdapter: ITyntecMoMessage.content.media.type other than image not supported: ${event.content.media.type}`);
         }
-        return {
-            channelData: {
-                whatsApp: event.from
-            },
-            text: event.content.text,
-            type: ActivityTypes.Message,
-        };
+
+        if (event.content.contentType === "text") {
+            return {
+                channelData: {
+                    whatsApp: event.from
+                },
+                text: event.content.text,
+                type: ActivityTypes.Message
+            };
+        }
+        if (event.content.contentType === "media") {
+            const mediaResponse = await this.tyntecClient.sendRequest("get", event.content.media.url, 200);
+            return {
+                attachments: [
+                    {
+                        contentType: mediaResponse.headers["content-type"],
+                        contentUrl: event.content.media.url
+                    }
+                ],
+                channelData: {
+                    whatsApp: event.from
+                },
+                text: event.content.media.caption,
+                textFormat: event.content.media.caption !== undefined ? TextFormatTypes.Plain : undefined,
+                type: ActivityTypes.Message
+            };
+        }
+        throw Error(`TyntecWhatsAppAdapter: invalid input: ${JSON.stringify(event)}`);
     }
 }

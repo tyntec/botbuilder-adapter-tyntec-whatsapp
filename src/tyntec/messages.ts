@@ -1,4 +1,28 @@
-export interface ITyntecWhatsAppMessage {
+export interface ITyntecMediaMoContent {
+    contentType: "media";
+    media: ITyntecMoMedia;
+}
+
+export interface ITyntecMoMedia {
+    caption?: string;
+    mediaId?: string;
+    type: "image";
+    url: string;
+}
+
+export interface ITyntecMoMessage {
+    channel: string;
+    content: ITyntecMediaMoContent | ITyntecTextMoContent;
+    event: "MoMessage";
+    from: string;
+}
+
+export interface ITyntecTextMoContent {
+    contentType: "text";
+    text: string;
+}
+
+export interface ITyntecWhatsAppMessageRequest {
     from: string;
     to: string;
     channel: "whatsapp";
@@ -15,18 +39,10 @@ export interface ITyntecWhatsAppImageContent {
     image: ITyntecWhatsAppImage;
 }
 
-export interface ITyntecWhatsAppMessageEvent extends ITyntecWhatsAppMessage {
-    event: "MoMessage"
-}
-
 export interface ITyntecWhatsAppTemplate {
     templateId: string;
     templateLanguage: string;
     components: ITyntecWhatsAppTemplateComponents;
-}
-
-export interface ITyntecWhatsAppTemplateComponents {
-    body: ITyntecWhatsAppTemplateTextBodyComponent[];
 }
 
 export interface ITyntecWhatsAppTemplateContent {
@@ -37,6 +53,10 @@ export interface ITyntecWhatsAppTemplateContent {
 export interface ITyntecWhatsAppTemplateTextBodyComponent {
     type: "text";
     text: string;
+}
+
+export interface ITyntecWhatsAppTemplateComponents {
+    body: ITyntecWhatsAppTemplateTextBodyComponent[];
 }
 
 export interface ITyntecWhatsAppTextContent {

@@ -1,5 +1,5 @@
-import axios, {AxiosInstance} from "axios";
-import { ITyntecWhatsAppMessage } from "./messages";
+import axios, {AxiosInstance, AxiosResponse, Method} from "axios";
+import { ITyntecWhatsAppMessageRequest } from "./messages";
 
 export class TyntecClient {
     axiosClient: AxiosInstance;
@@ -15,17 +15,28 @@ export class TyntecClient {
         });
     }
 
-    async sendWhatsAppMessage(message: ITyntecWhatsAppMessage): Promise<string> {
+    async sendWhatsAppMessage(data: ITyntecWhatsAppMessageRequest): Promise<string> {
         try {
-            const response = await this.axiosClient.request<{ messageId: string }>({
-                method: "post",
-                url: "/conversations/v3/messages",
-                data: message,
-                validateStatus: status => status === 202
-            })
+            const response = await this.sendRequest<{ messageId: string }>(
+                "post",
+                "/conversations/v3/messages",
+                202,
+                {
+                    data
+                }
+            );
             return response.data.messageId;
         } catch (e) {
             throw new Error(`Failed to send a WhatsApp message: ${e.response.status}: ${JSON.stringify(e.response.data)}`);
         }
+    }
+
+    async sendRequest<T = any>(method: Method, url: string, expectedStatus: number, opts?: {data?: any}): Promise<AxiosResponse<T>> {
+        return this.axiosClient.request<T>({
+            method,
+            url,
+            data: opts?.data,
+            validateStatus: status => status === expectedStatus
+        })
     }
 }
