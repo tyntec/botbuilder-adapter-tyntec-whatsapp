@@ -172,8 +172,8 @@ export class TyntecWhatsAppAdapter extends BotAdapter {
                 if (activity.attachments[0].content !== undefined) {
                     throw Error(`TyntecWhatsAppAdapter: Activity.attachments.content not supported: ${activity.attachments[0].content}`);
                 }
-                if (!activity.attachments[0].contentType.startsWith("image/")) {
-                    throw Error(`TyntecWhatsAppAdapter: Activity.attachments.contentType other than an image not supported: ${activity.attachments[0].contentType}`);
+                if (!activity.attachments[0].contentType.startsWith("image/") && !activity.attachments[0].contentType.startsWith("video/")) {
+                    throw Error(`TyntecWhatsAppAdapter: Activity.attachments.contentType other than an image and a video not supported: ${activity.attachments[0].contentType}`);
                 }
                 if (activity.attachments[0].contentUrl === undefined) {
                     throw Error(`TyntecWhatsAppAdapter: Activity.attachments.contentUrl is required: ${activity.attachments[0].contentUrl}`);
@@ -193,18 +193,34 @@ export class TyntecWhatsAppAdapter extends BotAdapter {
             }
 
             if (activity.attachments !== undefined) {
-                return {
-                    from: this.wabaNumber,
-                    to: activity.channelData.whatsApp,
-                    channel: "whatsapp",
-                    content: {
-                        contentType: "image",
-                        image: {
-                            url: activity.attachments[0].contentUrl!,
-                            caption: activity.text
+                if (activity.attachments[0].contentType.startsWith("image/")) {
+                    return {
+                        from: this.wabaNumber,
+                        to: activity.channelData.whatsApp,
+                        channel: "whatsapp",
+                        content: {
+                            contentType: "image",
+                            image: {
+                                url: activity.attachments[0].contentUrl!,
+                                caption: activity.text
+                            }
                         }
-                    }
-                };
+                    };
+                }
+                if (activity.attachments[0].contentType.startsWith("video/")) {
+                    return {
+                        from: this.wabaNumber,
+                        to: activity.channelData.whatsApp,
+                        channel: "whatsapp",
+                        content: {
+                            contentType: "video",
+                            video: {
+                                url: activity.attachments[0].contentUrl!,
+                                caption: activity.text
+                            }
+                        }
+                    };
+                }
             }
             return {
                 from: this.wabaNumber,
