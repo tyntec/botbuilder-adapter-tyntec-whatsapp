@@ -260,8 +260,8 @@ export class TyntecWhatsAppAdapter extends BotAdapter {
         if (event.event !== "MoMessage") {
             throw Error(`TyntecWhatsAppAdapter: ITyntecMoMessage.event other than MoMessage not supported: ${event.event}`)
         }
-        if (event.content.contentType === "media" && (event.content.media.type !== "image" && event.content.media.type !== "video")) {
-            throw Error(`TyntecWhatsAppAdapter: ITyntecMoMessage.content.media.type other than image and video not supported: ${event.content.media.type}`);
+        if (event.content.contentType === "media" && (event.content.media.type !== "document" && event.content.media.type !== "image" && event.content.media.type !== "video")) {
+            throw Error(`TyntecWhatsAppAdapter: ITyntecMoMessage.content.media.type other than document, image and video not supported: ${event.content.media.type}`);
         }
 
         if (event.content.contentType === "text") {
