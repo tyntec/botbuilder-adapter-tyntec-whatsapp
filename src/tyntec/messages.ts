@@ -2,7 +2,17 @@ export interface ITyntecWhatsAppMessage {
     from: string;
     to: string;
     channel: "whatsapp";
-    content: ITyntecWhatsAppTemplateContent | ITyntecWhatsAppTextContent;
+    content: ITyntecWhatsAppImageContent | ITyntecWhatsAppTemplateContent | ITyntecWhatsAppTextContent;
+}
+
+export interface ITyntecWhatsAppImage {
+    caption?: string;
+    url: string;
+}
+
+export interface ITyntecWhatsAppImageContent {
+    contentType: "image";
+    image: ITyntecWhatsAppImage;
 }
 
 export interface ITyntecWhatsAppMessageEvent extends ITyntecWhatsAppMessage {
