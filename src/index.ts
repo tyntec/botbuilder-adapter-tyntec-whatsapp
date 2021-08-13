@@ -1,4 +1,4 @@
-import {Activity, ActivityTypes, BotAdapter, ConversationReference, ResourceResponse, TurnContext, WebRequest, WebResponse} from "botbuilder";
+import {Activity, ActivityTypes, BotAdapter, ConversationReference, ResourceResponse, TextFormatTypes, TurnContext, WebRequest, WebResponse} from "botbuilder";
 import {ITyntecWhatsAppMessage, ITyntecWhatsAppMessageEvent} from "./tyntec/messages";
 import {TyntecClient} from "./tyntec/client";
 
@@ -150,12 +150,6 @@ export class TyntecWhatsAppAdapter extends BotAdapter {
         if (activity.summary !== undefined) {
             console.warn(`TyntecWhatsAppAdapter: Activity.summary not supported: ${activity.summary}`);
         }
-        if (activity.text !== undefined) {
-            throw Error(`TyntecWhatsAppAdapter: Activity.text not supported: ${activity.text}`);
-        }
-        if (activity.textFormat !== undefined) {
-            throw Error(`TyntecWhatsAppAdapter: Activity.textFormat not supported: ${activity.textFormat}`);
-        }
         if (activity.textHighlights !== undefined) {
             console.warn(`TyntecWhatsAppAdapter: Activity.textHighlights not supported: ${activity.textHighlights}`);
         }
@@ -171,15 +165,45 @@ export class TyntecWhatsAppAdapter extends BotAdapter {
         if (activity.valueType !== undefined) {
             console.warn(`TyntecWhatsAppAdapter: Activity.valueType not supported: ${activity.valueType}`);
         }
-        return {
-            from: this.wabaNumber,
-            to: activity.channelData.whatsApp,
-            channel: "whatsapp",
-            content: {
-                contentType: "template",
-                template: activity.channelData.template
+
+
+        if (activity.text !== undefined) {
+            if (activity.channelData.template !== undefined) {
+                throw Error(`TyntecWhatsAppAdapter: both Activity.text and Activity.channelData.template not supported: ${activity.text} and ${JSON.stringify(activity.channelData.template)}`);
             }
-        };
+            if (activity.textFormat !== TextFormatTypes.Plain) {
+                throw Error(`TyntecWhatsAppAdapter: Activity.textFormat other than ${TextFormatTypes.Plain} not supported: ${activity.textFormat}`);
+            }
+
+            return {
+                from: this.wabaNumber,
+                to: activity.channelData.whatsApp,
+                channel: "whatsapp",
+                content: {
+                    contentType: "text",
+                    text: activity.text
+                }
+            };
+        }
+        if (activity.channelData.template !== undefined) {
+            if (activity.text !== undefined) {
+                throw Error(`TyntecWhatsAppAdapter: both Activity.text and Activity.channelData.template not supported: ${activity.text} and ${JSON.stringify(activity.channelData.template)}`);
+            }
+            if (activity.textFormat !== undefined) {
+                throw Error(`TyntecWhatsAppAdapter: both Activity.textFormat and Activity.textFormat not supported: ${activity.textFormat} and ${JSON.stringify(activity.channelData.template)}`);
+            }
+
+            return {
+                from: this.wabaNumber,
+                to: activity.channelData.whatsApp,
+                channel: "whatsapp",
+                content: {
+                    contentType: "template",
+                    template: activity.channelData.template
+                }
+            };
+        }
+        throw Error(`TyntecWhatsAppAdapter: invalid input: ${activity}`);
     }
 
     protected parseTyntecWhatsAppMessageEvent(event: ITyntecWhatsAppMessageEvent): Partial<Activity> {
