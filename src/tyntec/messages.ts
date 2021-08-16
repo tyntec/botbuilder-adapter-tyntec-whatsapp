@@ -14,16 +14,32 @@ export interface ITyntecMoMedia {
     url: string;
 }
 
+export interface ITyntecMoContext {
+    isForwarded?: boolean;
+    isFrequentlyForwarded?: boolean;
+    messageId?: string;
+}
+
 export interface ITyntecMoMessage {
     channel: string;
     content: ITyntecMediaMoContent | ITyntecTextMoContent;
+    context?: ITyntecMoContext;
     event: "MoMessage";
     from: string;
+    groupId?: string;
+    messageId: string;
+    timestamp?: string;
+    to?: string;
+    whatsapp?: ITyntecWhatsapp;
 }
 
 export interface ITyntecTextMoContent {
     contentType: "text";
     text: string;
+}
+
+export interface ITyntecWhatsapp {
+    senderName?: string;
 }
 
 export interface ITyntecWhatsAppAudioContent {
