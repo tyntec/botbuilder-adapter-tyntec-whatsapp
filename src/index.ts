@@ -4,11 +4,13 @@ import {ITyntecMoMessage, ITyntecWhatsAppMessageRequest} from "./tyntec/messages
 import {composeTyntecRequestConfig, composeTyntecSendWhatsAppMessageRequestConfig, parseTyntecSendWhatsAppMessageResponse} from "./tyntec/axios";
 
 export interface ITyntecWhatsAppAdapterSettings {
+    maxBodySize?: number;
     tyntecApikey: string;
 }
 
 export class TyntecWhatsAppAdapter extends BotAdapter {
     private axiosClient: AxiosInstance;
+    public maxBodySize = 1024;
     public tyntecApikey: string;
 
     constructor(settings: ITyntecWhatsAppAdapterSettings) {
@@ -17,6 +19,9 @@ export class TyntecWhatsAppAdapter extends BotAdapter {
         this.axiosClient = axios.create({
             validateStatus: () => true
         });
+        if (settings.maxBodySize !== undefined) {
+            this.maxBodySize = settings.maxBodySize;
+        }
         this.tyntecApikey = settings.tyntecApikey;
     }
 
@@ -29,26 +34,40 @@ export class TyntecWhatsAppAdapter extends BotAdapter {
     }
 
     async processActivity(req: WebRequest, res: WebResponse, logic: (context: TurnContext) => Promise<any>): Promise<void> {
-        const requestBody = await new Promise((resolve: (value: ITyntecMoMessage) => void) => {
-            if (req.body !== undefined) {
-                return resolve(req.body);
-            }
+        try {
+            const requestBody = await new Promise((resolve: (value: ITyntecMoMessage) => void, reject: (reason?: any) => void) => {
+                if (req.body !== undefined) {
+                    return resolve(req.body);
+                }
 
-            let requestJson = '';
-            req.on!('data', (chunk: string) => {
-                requestJson += chunk;
+                let requestJson = '';
+                req.on!('data', (chunk: string) => {
+                    if (requestJson.length + chunk.length > this.maxBodySize) {
+                        reject(new Error(`Request body too large: > ${this.maxBodySize}`));
+                    }
+
+                    requestJson += chunk;
+                });
+                req.on!('end', (): void => {
+                    try {
+                        resolve(JSON.parse(requestJson));
+                    } catch (e) {
+                        reject(e);
+                    }
+                });
             });
-            req.on!('end', (): void => {
-                resolve(JSON.parse(requestJson));
-            });
-        });
 
-        const activity = await this.parseTyntecWhatsAppMessageEvent(requestBody);
-        const context = new TurnContext(this as any, activity);
-        await this.runMiddleware(context, logic);
+            const activity = await this.parseTyntecWhatsAppMessageEvent(requestBody);
+            const context = new TurnContext(this as any, activity);
+            await this.runMiddleware(context, logic);
 
-        res.status(200);
-        res.end();
+            res.status(200);
+            res.end();
+        } catch (e) {
+            res.status(500);
+            res.send(`Failed to process request: ${e}`);
+            res.end();
+        }
     }
 
     async sendActivities(context: TurnContext, activities: Partial<Activity>[]): Promise<ResourceResponse[]> {
