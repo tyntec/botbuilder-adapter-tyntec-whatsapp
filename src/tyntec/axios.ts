@@ -9,25 +9,25 @@ export function composeTyntecSendWhatsAppMessageRequestConfig(apikey: string, da
         "application/json",
         {
             contentType: "application/json",
-            data
+            content: data
         }
     );
 }
 
-export function composeTyntecRequestConfig(method: Method, url: string, apikey: string, accept: string, opts?: {contentType?: string, data?: any}): AxiosRequestConfig {
-    const headers: any = {
-        accept,
-        apikey
-    };
-    if (opts?.contentType !== undefined) {
-        headers["content-type"] = opts.contentType;
-    }
-    return {
+export function composeTyntecRequestConfig(method: Method, url: string, apikey: string, accept: string, data?: {content: any, contentType: string}): AxiosRequestConfig {
+    const config: AxiosRequestConfig = {
         method,
         url: new URL(url, "https://api.tyntec.com").toString(),
-        headers,
-        data: opts?.data
+        headers: {
+            accept,
+            apikey
+        },
     };
+    if (data !== undefined) {
+        config.data = data.content;
+        config.headers["content-type"] = data.contentType;
+    }
+    return config;
 }
 
 export function parseTyntecSendWhatsAppMessageResponse(response: AxiosResponse): string {
