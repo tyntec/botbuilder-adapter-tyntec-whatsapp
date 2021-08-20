@@ -1,5 +1,5 @@
 var assert = require("assert");
-var { composeTyntecRequestConfig, composeTyntecSendWhatsAppMessageRequestConfig } = require("../../lib/tyntec/axios");
+var { composeTyntecRequestConfig, composeTyntecSendWhatsAppMessageRequestConfig, parseTyntecSendWhatsAppMessageResponse } = require("../../lib/tyntec/axios");
 
 describe("composeTyntecSendWhatsAppMessageRequestConfig", function() {
     it("should return a request to send a WhatsApp message", function() {
@@ -79,5 +79,52 @@ describe("composeTyntecRequestConfig", function() {
         const config = composeTyntecRequestConfig(method, url, apikey, accept);
 
         assert.strictEqual(config.url, "https://example.com/channels/whatsapp/accounts");
+    });
+});
+
+describe("parseTyntecSendWhatsAppMessageResponse", function() {
+    it("should return the message ID when a successful response is present", function() {
+        const response = {
+            status: 202,
+            statusText: "",  // TODO
+            headers: {},  // TODO
+            data: {
+                "messageId": "77185196-664a-43ec-b14a-fe97036c697f",
+                "acceptedAt": "2019-08-24T14:15:22Z"
+            },
+            config: {},  // TODO
+            request: {}  // TODO
+        };
+
+        const messageId = parseTyntecSendWhatsAppMessageResponse(response);
+
+        assert.strictEqual(messageId, "77185196-664a-43ec-b14a-fe97036c697f");
+    });
+
+    it("should throw an error when an unsuccessful response is present", function() {
+        const response = {
+            status: 400,
+            statusText: "Bad Request",
+            headers: {
+                "content-length": "129",
+                "content-type": "application/json",
+                "date": "Mon, 23 Aug 2021 08:35:10 GMT",
+                "server": "nginx"
+            },
+            data: {
+                "type": "https://docs.tyntec.com/problems",
+                "title": "Missing parameters",
+                "status": 400,
+                "detail": "Mandatory parameter [to] missing"
+            },
+            config: {
+                url: "https://example.com/channels/whatsapp/accounts"
+            },
+            request: {}
+        };
+
+        assert.throws(() =>
+            parseTyntecSendWhatsAppMessageResponse(response)
+        );
     });
 });
