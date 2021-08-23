@@ -89,6 +89,9 @@ export class TyntecWhatsAppAdapter extends BotAdapter {
     }
 
     protected composeTyntecWhatsAppMessageRequest(activity: Partial<Activity>): ITyntecWhatsAppMessageRequest {
+        if (activity.type !== ActivityTypes.Message) {
+            throw Error(`TyntecWhatsAppAdapter: Activity.type other than ${ActivityTypes.Message} not supported: ${activity.type}`);
+        }
         if (activity.attachmentLayout !== undefined) {
             console.warn(`TyntecWhatsAppAdapter: Activity.attachmentLayout not supported: ${activity.attachmentLayout}`);
         }
@@ -140,15 +143,12 @@ export class TyntecWhatsAppAdapter extends BotAdapter {
         if (activity.textFormat !== undefined) {
             throw Error(`TyntecWhatsAppAdapter: Activity.textFormat not supported: ${activity.textFormat}`);
         }
-        if (activity.type !== ActivityTypes.Message) {
-            throw Error(`TyntecWhatsAppAdapter: Activity.type other than ${ActivityTypes.Message} not supported: ${activity.type}`);
-        }
 
-        if (activity.channelData.contentType === "text") {
+        if (activity.channelData!.contentType === "text") {
             if (activity.attachments !== undefined) {
                 throw Error(`TyntecWhatsAppAdapter: both text Activity.channelData.contentType and Activity.attachments not supported: ${activity.channelData.contentType} and ${JSON.stringify(activity.attachments)}`);
             }
-            if (activity.channelData.template !== undefined) {
+            if (activity.channelData!.template !== undefined) {
                 throw Error(`TyntecWhatsAppAdapter: both text Activity.channelData.contentType and Activity.channelData.template not supported: ${activity.channelData.contentType} and ${JSON.stringify(activity.channelData.template)}`);
             }
             if (activity.text === undefined) {
@@ -165,7 +165,7 @@ export class TyntecWhatsAppAdapter extends BotAdapter {
                 }
             };
         }
-        if (activity.channelData.contentType === "audio" || activity.channelData.contentType === "document" || activity.channelData.contentType === "image" || activity.channelData.contentType === "sticker" || activity.channelData.contentType === "video") {
+        if (activity.channelData!.contentType === "audio" || activity.channelData!.contentType === "document" || activity.channelData!.contentType === "image" || activity.channelData!.contentType === "sticker" || activity.channelData!.contentType === "video") {
             if (activity.attachments === undefined || activity.attachments.length !== 1) {
                 throw Error(`TyntecWhatsAppAdapter: other than exactly one Activity.attachments not supported: ${activity.attachments?.length}`);
             }
@@ -178,11 +178,11 @@ export class TyntecWhatsAppAdapter extends BotAdapter {
             if (activity.attachments[0].thumbnailUrl !== undefined) {
                 console.warn(`TyntecWhatsAppAdapter: Activity.attachments.thumbnailUrl not supported: ${activity.attachments[0].thumbnailUrl}`);
             }
-            if (activity.channelData.template !== undefined) {
+            if (activity.channelData!.template !== undefined) {
                 throw Error(`TyntecWhatsAppAdapter: both Activity.text and Activity.channelData.template not supported: ${activity.text} and ${JSON.stringify(activity.channelData.template)}`);
             }
 
-            if (activity.channelData.contentType === "audio") {
+            if (activity.channelData!.contentType === "audio") {
                 if (activity.text !== undefined) {
                     throw Error(`TyntecWhatsAppAdapter: both audio Activity.channelData.contentType and Activity.text not supported: ${activity.channelData.contentType} and ${activity.text}`);
                 }
@@ -199,7 +199,7 @@ export class TyntecWhatsAppAdapter extends BotAdapter {
                     }
                 };
             }
-            if (activity.channelData.contentType === "document") {
+            if (activity.channelData!.contentType === "document") {
                 return {
                     from: activity.from.id,
                     to: activity.conversation.id,
@@ -214,7 +214,7 @@ export class TyntecWhatsAppAdapter extends BotAdapter {
                     }
                 };
             }
-            if (activity.channelData.contentType === "image") {
+            if (activity.channelData!.contentType === "image") {
                 return {
                     from: activity.from.id,
                     to: activity.conversation.id,
@@ -228,7 +228,7 @@ export class TyntecWhatsAppAdapter extends BotAdapter {
                     }
                 };
             }
-            if (activity.channelData.contentType === "sticker") {
+            if (activity.channelData!.contentType === "sticker") {
                 if (activity.text !== undefined) {
                     throw Error(`TyntecWhatsAppAdapter: both sticker Activity.channelData.contentType and Activity.text not supported: ${activity.channelData.contentType} and ${activity.text}`);
                 }
@@ -245,7 +245,7 @@ export class TyntecWhatsAppAdapter extends BotAdapter {
                     }
                 };
             }
-            if (activity.channelData.contentType === "video") {
+            if (activity.channelData!.contentType === "video") {
                 return {
                     from: activity.from.id,
                     to: activity.conversation.id,
@@ -260,11 +260,11 @@ export class TyntecWhatsAppAdapter extends BotAdapter {
                 };
             }
         }
-        if (activity.channelData.contentType === "template") {
+        if (activity.channelData!.contentType === "template") {
             if (activity.attachments !== undefined) {
                 throw Error(`TyntecWhatsAppAdapter: both Activity.attachments and template Activity.channelData.contentType not supported: ${JSON.stringify(activity.attachments)} and ${JSON.stringify(activity.channelData.template)}`);
             }
-            if (activity.channelData.template === undefined) {
+            if (activity.channelData!.template === undefined) {
                 throw Error(`TyntecWhatsAppAdapter: template Activity.channelData.contentType requires Activity.channelData.template: ${activity.channelData.template}`);
             }
             if (activity.text !== undefined) {
@@ -277,7 +277,7 @@ export class TyntecWhatsAppAdapter extends BotAdapter {
                 channel: "whatsapp",
                 content: {
                     contentType: "template",
-                    template: activity.channelData.template
+                    template: activity.channelData!.template
                 }
             };
         }
