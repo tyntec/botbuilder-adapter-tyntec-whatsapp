@@ -1,24 +1,23 @@
 import {Activity, ActivityTypes, BotAdapter, ConversationAccount, ConversationReference, ChannelAccount, ResourceResponse, TurnContext, WebRequest, WebResponse} from "botbuilder";
-import axios, {AxiosInstance} from "axios";
+import {AxiosInstance} from "axios";
 import {ITyntecMoMessage, ITyntecWhatsAppMessageRequest} from "./tyntec/messages";
 import {composeTyntecRequestConfig, composeTyntecSendWhatsAppMessageRequestConfig, parseTyntecSendWhatsAppMessageResponse} from "./tyntec/axios";
 
 export interface ITyntecWhatsAppAdapterSettings {
+    axiosInstance: AxiosInstance;
     maxBodySize?: number;
     tyntecApikey: string;
 }
 
 export class TyntecWhatsAppAdapter extends BotAdapter {
-    private axiosClient: AxiosInstance;
+    public axiosInstance: AxiosInstance;
     public maxBodySize = 1024;
     public tyntecApikey: string;
 
     constructor(settings: ITyntecWhatsAppAdapterSettings) {
         super();
 
-        this.axiosClient = axios.create({
-            validateStatus: () => true
-        });
+        this.axiosInstance = settings.axiosInstance;
         if (settings.maxBodySize !== undefined) {
             this.maxBodySize = settings.maxBodySize;
         }
@@ -75,8 +74,9 @@ export class TyntecWhatsAppAdapter extends BotAdapter {
         for (const activity of activities) {
             const tyntecRequest = this.composeTyntecWhatsAppMessageRequest(activity);
             const axiosRequest = composeTyntecSendWhatsAppMessageRequestConfig(this.tyntecApikey, tyntecRequest);
+            axiosRequest.validateStatus = () => true;
 
-            const axiosResponse = await this.axiosClient.request(axiosRequest);
+            const axiosResponse = await this.axiosInstance.request(axiosRequest);
 
             const messageId = parseTyntecSendWhatsAppMessageResponse(axiosResponse);
             responses.push({id: messageId});
@@ -331,9 +331,10 @@ export class TyntecWhatsAppAdapter extends BotAdapter {
         }
         if (body.content.contentType === "media") {
             const mediaRequest = composeTyntecRequestConfig("get", body.content.media.url, this.tyntecApikey, "*/*");
+            mediaRequest.validateStatus = () => true;
             let mediaResponse;
             try{
-                mediaResponse = await this.axiosClient.request(mediaRequest);
+                mediaResponse = await this.axiosInstance.request(mediaRequest);
             } catch (e) {
                 throw new Error(`Failed to download media: ${e.response.status}: ${JSON.stringify(e.response.data)}`);
             }
