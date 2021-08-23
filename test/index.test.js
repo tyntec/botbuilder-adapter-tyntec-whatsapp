@@ -52,6 +52,316 @@ describe("TyntecWhatsAppAdapter", function() {
             assert.strictEqual(adapter.maxBodySize, 512);
         });
     });
+
+    describe("#composeTyntecWhatsAppMessageRequest", function() {
+        it("should compose a text message request", function () {
+            const adapter = new TyntecWhatsAppAdapter({
+                axiosInstance: axios.create(),
+                tyntecApikey: "ABcdefGhI1jKLMNOPQRst2UVWx345yz6"
+            });
+            const activity = {
+                type: ActivityTypes.Message,
+                channelId: "whatsapp",
+                from: { id: "+1233423454" },
+                conversation: { id: "545345345" },
+                channelData: { contentType: "text" },
+                text: "A simple text message"
+            };
+
+            const messageRequest = adapter.composeTyntecWhatsAppMessageRequest(activity);
+
+            assert.deepStrictEqual(messageRequest, {
+                from: "+1233423454",
+                to: "545345345",
+                channel: "whatsapp",
+                content: {
+                    contentType: "text",
+                    text: "A simple text message"
+                }
+            });
+        });
+
+        it("should compose an audio message request", function () {
+            const adapter = new TyntecWhatsAppAdapter({
+                axiosInstance: axios.create(),
+                tyntecApikey: "ABcdefGhI1jKLMNOPQRst2UVWx345yz6"
+            });
+            const activity = {
+                type: ActivityTypes.Message,
+                channelId: "whatsapp",
+                from: { id: "+1233423454" },
+                conversation: { id: "545345345" },
+                channelData: { contentType: "audio" },
+                attachments: [
+                    {
+                        contentType: "audio/ac3",
+                        contentUrl: "https://example.com/audio.ac3"
+                    }
+                ]
+            };
+
+            const messageRequest = adapter.composeTyntecWhatsAppMessageRequest(activity);
+
+            assert.deepStrictEqual(messageRequest, {
+                from: "+1233423454",
+                to: "545345345",
+                channel: "whatsapp",
+                content: {
+                    contentType: "audio",
+                    audio: {
+                        url: "https://example.com/audio.ac3"
+                    }
+                }
+            });
+        });
+
+        it("should compose a document message request", function () {
+            const adapter = new TyntecWhatsAppAdapter({
+                axiosInstance: axios.create(),
+                tyntecApikey: "ABcdefGhI1jKLMNOPQRst2UVWx345yz6"
+            });
+            const activity = {
+                type: ActivityTypes.Message,
+                channelId: "whatsapp",
+                from: { id: "+1233423454" },
+                conversation: { id: "545345345" },
+                channelData: { contentType: "document" },
+                text: "A document caption",
+                attachments: [
+                    {
+                        contentType: "application/pdf",
+                        contentUrl: "https://example.com/document.pdf",
+                        name: "document.pdf"
+                    }
+                ]
+            };
+
+            const messageRequest = adapter.composeTyntecWhatsAppMessageRequest(activity);
+
+            assert.deepStrictEqual(messageRequest, {
+                from: "+1233423454",
+                to: "545345345",
+                channel: "whatsapp",
+                content: {
+                    contentType: "document",
+                    document: {
+                        caption: "A document caption",
+                        filename: "document.pdf",
+                        url: "https://example.com/document.pdf"
+                    }
+                }
+            });
+        });
+
+        it("should compose an image message request", function () {
+            const adapter = new TyntecWhatsAppAdapter({
+                axiosInstance: axios.create(),
+                tyntecApikey: "ABcdefGhI1jKLMNOPQRst2UVWx345yz6"
+            });
+            const activity = {
+                type: ActivityTypes.Message,
+                channelId: "whatsapp",
+                from: { id: "+1233423454" },
+                conversation: { id: "545345345" },
+                channelData: { contentType: "image" },
+                text: "An image caption",
+                attachments: [
+                    {
+                        contentType: "image/png",
+                        contentUrl: "https://example.com/image.png"
+                    }
+                ]
+            };
+
+            const messageRequest = adapter.composeTyntecWhatsAppMessageRequest(activity);
+
+            assert.deepStrictEqual(messageRequest, {
+                from: "+1233423454",
+                to: "545345345",
+                channel: "whatsapp",
+                content: {
+                    contentType: "image",
+                    image: {
+                        caption: "An image caption",
+                        url: "https://example.com/image.png"
+                    }
+                }
+            });
+        });
+
+        it("should compose a sticker message request", function () {
+            const adapter = new TyntecWhatsAppAdapter({
+                axiosInstance: axios.create(),
+                tyntecApikey: "ABcdefGhI1jKLMNOPQRst2UVWx345yz6"
+            });
+            const activity = {
+                type: ActivityTypes.Message,
+                channelId: "whatsapp",
+                from: { id: "+1233423454" },
+                conversation: { id: "545345345" },
+                channelData: { contentType: "sticker" },
+                attachments: [
+                    {
+                        contentType: "image/webp",
+                        contentUrl: "https://example.com/sticker.webp"
+                    }
+                ]
+            };
+
+            const messageRequest = adapter.composeTyntecWhatsAppMessageRequest(activity);
+
+            assert.deepStrictEqual(messageRequest, {
+                from: "+1233423454",
+                to: "545345345",
+                channel: "whatsapp",
+                content: {
+                    contentType: "sticker",
+                    sticker: {
+                        url: "https://example.com/sticker.webp"
+                    }
+                }
+            });
+        });
+
+        it("should compose a video message request", function () {
+            const adapter = new TyntecWhatsAppAdapter({
+                axiosInstance: axios.create(),
+                tyntecApikey: "ABcdefGhI1jKLMNOPQRst2UVWx345yz6"
+            });
+            const activity =  {
+                type: ActivityTypes.Message,
+                channelId: "whatsapp",
+                from: { id: "+1233423454" },
+                conversation: { id: "545345345" },
+                channelData: { contentType: "video" },
+                text: "A video caption",
+                attachments: [
+                    {
+                        contentType: "video/mp4",
+                        contentUrl: "https://example.com/video.mp4"
+                    }
+                ]
+            };
+
+            const messageRequest = adapter.composeTyntecWhatsAppMessageRequest(activity);
+
+            assert.deepStrictEqual(messageRequest, {
+                from: "+1233423454",
+                to: "545345345",
+                channel: "whatsapp",
+                content: {
+                    contentType: "video",
+                    video: {
+                        caption: "A video caption",
+                        url: "https://example.com/video.mp4"
+                    }
+                }
+            });
+        });
+
+        it("should compose a template message request", function () {
+            const adapter = new TyntecWhatsAppAdapter({
+                axiosInstance: axios.create(),
+                tyntecApikey: "ABcdefGhI1jKLMNOPQRst2UVWx345yz6"
+            });
+            const activity =  {
+                type: ActivityTypes.Message,
+                channelId: "whatsapp",
+                from: { id: "+1233423454" },
+                conversation: { id: "545345345" },
+                channelData: {
+                    contentType: "template",
+                    template: {
+                        templateId: "template_id",
+                        templateLanguage: "en",
+                        components: {
+                            header: [
+                                {
+                                    type: "image",
+                                    image: {
+                                        url: "https://example.com/image.png"
+                                    }
+                                }
+                            ],
+                            body: [
+                                {
+                                    type: "text",
+                                    text: "lorem"
+                                }
+                            ]
+                        }
+                    }
+                }
+            };
+
+            const messageRequest = adapter.composeTyntecWhatsAppMessageRequest(activity);
+
+            assert.deepStrictEqual(messageRequest, {
+                from: "+1233423454",
+                to: "545345345",
+                channel: "whatsapp",
+                content: {
+                    contentType: "template",
+                    template: {
+                        templateId: "template_id",
+                        templateLanguage: "en",
+                        components: {
+                            header: [
+                                {
+                                    type: "image",
+                                    image: {
+                                        url: "https://example.com/image.png"
+                                    }
+                                }
+                            ],
+                            body: [
+                                {
+                                    type: "text",
+                                    text: "lorem"
+                                }
+                            ]
+                        }
+                    }
+                }
+            });
+        });
+
+        it("should throw an error when an activity is not supported", function () {
+            const adapter = new TyntecWhatsAppAdapter({
+                axiosInstance: axios.create(),
+                tyntecApikey: "ABcdefGhI1jKLMNOPQRst2UVWx345yz6"
+            });
+            const activity = {
+                channelData: {},
+                channelId: "whatsapp",
+                conversation: { id: "545345345" },
+                from: { id: "+1233423454" },
+                type: ActivityTypes.Typing
+            };
+
+            assert.throws(() =>
+                adapter.composeTyntecWhatsAppMessageRequest(activity)
+            )
+        });
+
+        it("should throw an error when a content type is not supported", function () {
+            const adapter = new TyntecWhatsAppAdapter({
+                axiosInstance: axios.create(),
+                tyntecApikey: "ABcdefGhI1jKLMNOPQRst2UVWx345yz6"
+            });
+            const activity = {
+                type: ActivityTypes.Message,
+                channelId: "whatsapp",
+                from: { id: "+1233423454" },
+                conversation: { id: "545345345" },
+                channelData: { contentType: "foo" }
+            };
+
+            assert.throws(() =>
+                adapter.composeTyntecWhatsAppMessageRequest(activity)
+            )
+        });
+    });
     
     describe("#processActivity", function() {
         it("should process the request when the body is not present", async function () {
