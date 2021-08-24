@@ -363,6 +363,44 @@ describe("TyntecWhatsAppAdapter", function() {
         });
     });
 
+    describe("#onTurnError", function() {
+        it("should return undefined when no error handler is present", function() {
+            const adapter = new TyntecWhatsAppAdapter({
+                axiosInstance: axios.create(),
+                tyntecApikey: "ABcdefGhI1jKLMNOPQRst2UVWx345yz6"
+            });
+
+            const actualHandler = adapter.onTurnError;
+
+            assert.strictEqual(actualHandler, undefined);
+        });
+
+        it("should return the error handler when present", function() {
+            const handler = async (context, error) => null;
+            const adapter = new TyntecWhatsAppAdapter({
+                axiosInstance: axios.create(),
+                tyntecApikey: "ABcdefGhI1jKLMNOPQRst2UVWx345yz6"
+            });
+            adapter.onTurnError = handler;
+
+            const actualHandler = adapter.onTurnError;
+
+            assert.strictEqual(actualHandler, handler);
+        });
+
+        it("should set an error handler", function() {
+            const handler = async (context, error) => null;
+            const adapter = new TyntecWhatsAppAdapter({
+                axiosInstance: axios.create(),
+                tyntecApikey: "ABcdefGhI1jKLMNOPQRst2UVWx345yz6"
+            });
+
+            adapter.onTurnError = handler;
+
+            assert.strictEqual(adapter.onTurnError, handler);
+        });
+    })
+
     describe("#parseTyntecWhatsAppMessageEvent", function() {
         it("should parse a text message event", async function() {
             const adapter = new TyntecWhatsAppAdapter({
