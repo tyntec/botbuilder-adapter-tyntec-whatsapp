@@ -1325,6 +1325,48 @@ describe("TyntecWhatsAppAdapter", function() {
             )
         });
     });
+
+    describe("#use", function () {
+        it("should add a middlewares to the pipeline", async function () {
+            const middlewareCalls = [];
+            const req = new WebRequestStub({
+                method: "POST",
+                headers: {
+                    "host": "example.com",
+                    "content-length": "229",
+                    "content-type": "application/json",
+                    "accept": "*/*"
+                }
+            });
+            const res = new WebResponseStub();
+            const adapter = new TyntecWhatsAppAdapter({
+                axiosInstance: axios.create(),
+                tyntecApikey: "ABcdefGhI1jKLMNOPQRst2UVWx345yz6"
+            });
+
+            adapter.use(
+                {
+                    onTurn: async (context, next) => {
+                        middlewareCalls.push("1a");
+                        await next();
+                        middlewareCalls.push("1b");
+                    }
+                },
+                async (context, next) => {
+                    middlewareCalls.push("2a");
+                    await next();
+                    middlewareCalls.push("2b");
+                }
+            );
+
+            const promise = adapter.processActivity(req, res, () => null);
+            req.emit("data", "{\"channel\":\"whatsapp\",\"content\":{\"contentType\":\"text\",\"text\":\"A simple text message\"},\"event\":\"MoMessage\",\"from\":");
+            req.emit("data", "\"+1233423454\",\"messageId\":\"77185196-664a-43ec-b14a-fe97036c697e\",\"timestamp\":\"2019-06-26T11:41:00\",\"to\":\"545345345\"}");
+            req.emit("end");
+            await promise;
+            assert.deepStrictEqual(middlewareCalls, ["1a", "2a", "2b", "1b"]);
+        });
+    });
 });
 
 class WebRequestStub extends EventEmitter {
