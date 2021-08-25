@@ -61,7 +61,7 @@ export interface ITyntecWhatsAppMessageRequest {
     from: string;
     to: string;
     channel: "whatsapp";
-    content: ITyntecWhatsAppAudioContent | ITyntecWhatsAppDocumentContent | ITyntecWhatsAppImageContent | ITyntecWhatsAppStickerContent | ITyntecWhatsAppTemplateContent | ITyntecWhatsAppTextContent | ITyntecWhatsAppVideoContent;
+    content: ITyntecWhatsAppAudioContent | ITyntecWhatsAppDocumentContent | ITyntecWhatsAppImageContent | ITyntecWhatsAppLocationContent | ITyntecWhatsAppStickerContent | ITyntecWhatsAppTemplateContent | ITyntecWhatsAppTextContent | ITyntecWhatsAppVideoContent;
 }
 
 export interface ITyntecWhatsAppImage extends ITyntecBaseMedia {
