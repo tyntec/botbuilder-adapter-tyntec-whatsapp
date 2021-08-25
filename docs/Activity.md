@@ -49,6 +49,7 @@ Additional properties of channel WhatsApp message activities:
 The supported WhatsApp messages are [audio](#whatsapp-audio-message-activity),
 [document](#whatsapp-document-message-activity),
 [image](#whatsapp-image-message-activity),
+[location](#whatsapp-location-message-activity),
 [sticker](#whatsapp-sticker-message-activity),
 [template](#whatsapp-template-message-activity),
 [text](#whatsapp-text-message-activity) and
@@ -60,6 +61,7 @@ The supported WhatsApp messages are [audio](#whatsapp-audio-message-activity),
 Properties of all supported WhatsApp audio message activities:
 * `channelData: any` (REQUIRED)
 * `channelData.contentType = "audio"` (REQUIRED)
+* `channelData.location = undefined` (DISALLOWED)
 * `channelData.template = undefined` (DISALLOWED)
 * `text = undefined` (DISALLOWED)
 * `attachments: Attachment[]` (REQUIRED) - exactly one attachment is required
@@ -108,6 +110,7 @@ activity === {
 Properties of all supported WhatsApp document message activities:
 * `channelData: any` (REQUIRED)
 * `channelData.contentType = "document"` (REQUIRED)
+* `channelData.location = undefined` (DISALLOWED)
 * `channelData.template = undefined` (DISALLOWED)
 * `text?: string` (OPTIONAL) - the document caption
 * `attachments: Attachment[]` (REQUIRED) - exactly one attachment is required
@@ -158,6 +161,7 @@ activity === {
 Properties of all supported WhatsApp image message activities:
 * `channelData: any` (REQUIRED)
 * `channelData.contentType = "image"` (REQUIRED)
+* `channelData.location = undefined` (DISALLOWED)
 * `channelData.template = undefined` (DISALLOWED)
 * `text?: string` (OPTIONAL) - the image caption
 * `attachments: Attachment[]` (REQUIRED) - exactly one attachment is required
@@ -202,11 +206,56 @@ activity === {
 ```
 
 
+### WhatsApp Location Message Activity
+
+Properties of all supported WhatsApp location message activities:
+* `channelData: any` (REQUIRED)
+* `channelData.contentType = "location"` (REQUIRED)
+* `channelData.location: WhatsAppLocation` (REQUIRED) - a valid [WhatsAppLocation](https://api.tyntec.com/reference/conversations/current.html)
+  object
+* `channelData.template = undefined` (DISALLOWED)
+* `text = undefined` (DISALLOWED)
+* `attachments = undefined` (DISALLOWED)
+
+A WhatsApp location message activity example:
+
+```javascript
+activity === {
+    type: "message",
+    channelId: "whatsapp",
+    id: "77185196-664a-43ec-b14a-fe97036c697e",
+    timestamp: new Date("2019-06-26T09:41:00.000Z"),
+    from: {
+        id: "+1233423454"
+    },
+    recipient: {
+        id: "545345345"
+    },
+    conversation: {
+        id: "+1233423454",
+        isGroup: false,
+        name: "John Doe"
+    },
+    channelData: {
+        contentType: "location",
+        location: {
+            address: "tyntec GmbH, Semerteichstraße, Dortmund",
+            latitude: 51.5005765,
+            longitude: 7.4954884,
+            name: "tyntec GmbH"
+        }
+    },
+    serviceUrl: "https://api.tyntec.com/conversations/v3/messages"
+}
+```
+
+
 ### WhatsApp Sticker Message Activity
 
 Properties of all supported WhatsApp sticker message activities:
 * `channelData: any` (REQUIRED)
 * `channelData.contentType = "sticker"` (REQUIRED)
+* `channelData.location = undefined` (DISALLOWED)
 * `channelData.template = undefined` (DISALLOWED)
 * `text = undefined` (DISALLOWED)
 * `attachments: Attachment[]` (REQUIRED) - exactly one attachment is required
@@ -256,6 +305,7 @@ activity === {
 Properties of all supported WhatsApp template message activities:
 * `channelData: any` (REQUIRED)
 * `channelData.contentType = "template"` (REQUIRED)
+* `channelData.location = undefined` (DISALLOWED)
 * `channelData.template: WhatsAppTemplate` (REQUIRED) - a valid [WhatsAppTemplate](https://api.tyntec.com/reference/conversations/current.html)
   object
 * `text = undefined` (DISALLOWED)
@@ -315,6 +365,7 @@ activity === {
 Properties of all supported WhatsApp text message activities:
 * `channelData: any` (REQUIRED)
 * `channelData.contentType = "text"` (REQUIRED)
+* `channelData.location = undefined` (DISALLOWED)
 * `channelData.template = undefined` (DISALLOWED)
 * `text: string` (REQUIRED)
 * `attachments = undefined` (DISALLOWED)
@@ -354,6 +405,7 @@ activity === {
 Properties of all supported WhatsApp video message activities:
 * `channelData: any` (REQUIRED)
 * `channelData.contentType = "video"` (REQUIRED)
+* `channelData.location = undefined` (DISALLOWED)
 * `channelData.template = undefined` (DISALLOWED)
 * `text?: string` (OPTIONAL) - the video caption
 * `attachments: Attachment[]` (REQUIRED) - exactly one attachment is required

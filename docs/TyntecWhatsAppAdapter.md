@@ -73,6 +73,7 @@ is supported. These are events that meet the following criteria:
   an audio message (`body.content.contentType === "media" && body.content.media.type === "audio"`),
   a document message (`body.content.contentType === "media" && body.content.media.type === "document"`),
   an image message (`body.content.contentType === "media" && body.content.media.type === "image"`),
+  a location message (`body.content.contentType === "location"`),
   a sticker message (`body.content.contentType === "media" && body.content.media.type === "sticker"`) or
   a video message (`body.content.contentType === "media" && body.content.media.type === "video"`).
 
@@ -98,7 +99,15 @@ Returns an array of objects of `ResourceResponse` type containing IDs of the
 delivered messages.
 
 See [Activity.md](./Activity.md) to find out what activities may be passed to
-`sendActivities`.
+`sendActivities`. The supported activities are:
+
+* WhatsApp audio message activities,
+* WhatsApp document message activities,
+* WhatsApp image message activities,
+* WhatsApp sticker message activities,
+* WhatsApp template message activities,
+* WhatsApp text message activities and
+* WhatsApp video message activities.
 
 
 ## `public use(...middlewares: (MiddlewareHandler | Middleware)[]): TyntecWhatsAppAdapter`

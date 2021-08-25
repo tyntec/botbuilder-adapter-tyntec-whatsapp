@@ -22,7 +22,7 @@ export interface ITyntecMoContext {
 
 export interface ITyntecMoMessage {
     channel: string;
-    content: ITyntecMediaMoContent | ITyntecTextMoContent;
+    content: ITyntecMediaMoContent | ITyntecTextMoContent | ITyntecWhatsAppLocationContent;
     context?: ITyntecMoContext;
     event: "MoMessage";
     from: string;
@@ -71,6 +71,18 @@ export interface ITyntecWhatsAppImage extends ITyntecBaseMedia {
 export interface ITyntecWhatsAppImageContent {
     contentType: "image";
     image: ITyntecWhatsAppImage;
+}
+
+export interface ITyntecWhatsAppLocation {
+    address?: string;
+    latitude: number;
+    longitude: number;
+    name?: string;
+}
+
+export interface ITyntecWhatsAppLocationContent {
+    contentType: "location",
+    location: ITyntecWhatsAppLocation
 }
 
 export interface ITyntecWhatsAppStickerContent {
