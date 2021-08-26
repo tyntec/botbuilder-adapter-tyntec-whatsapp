@@ -12,6 +12,7 @@ Properties:
 Methods:
 * [`public constructor(settings: ITyntecWhatsAppAdapterSettings)`](#public-constructorsettings-ityntecwhatsappadaptersettings)
 * [`public processActivity(req: WebRequest, res: WebResponse, logic: (context: TurnContext) => Promise<any>): Promise<void>`](#public-processactivityreq-webrequest-res-webresponse-logic-context-turncontext--promiseany-promisevoid)
+* [`public sendActivities(context: TurnContext, activities: Partial<Activity>[]): Promise<ResourceResponse[]>`](#public-sendactivitiescontext-turncontext-activities-partialactivity-promiseresourceresponse)
 
 If you want more information about bot adapters, see the [Microsoft Bot Framework SDK documentation](https://docs.microsoft.com/en-us/azure/bot-service/index-bf-sdk).
 
@@ -81,3 +82,18 @@ If the request is valid, the Webhook event is supported and neither the
 middleware pipeline nor the `logic` function throws an error, the status code
 of the response is set to 200. Otherwise, the status code is set to 500 and an
 error message is written to the body.
+
+
+## `public sendActivities(context: TurnContext, activities: Partial<Activity>[]): Promise<ResourceResponse[]>`
+
+Asynchronously modifies the turn `context` and sends the set of outgoing
+`activities` as WhatsApp messages.
+
+It is intended to be called through the turn context and not directly from a
+bot.
+
+Returns an array of objects of `ResourceResponse` type containing IDs of the
+delivered messages.
+
+See [Activity.md](./Activity.md) to find out what activities may be passed to
+`sendActivities`.

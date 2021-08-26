@@ -50,6 +50,7 @@ The supported WhatsApp messages are [audio](#whatsapp-audio-message-activity),
 [document](#whatsapp-document-message-activity),
 [image](#whatsapp-image-message-activity),
 [sticker](#whatsapp-sticker-message-activity),
+[template](#whatsapp-template-message-activity),
 [text](#whatsapp-text-message-activity) and
 [video](#whatsapp-video-message-activity) messages.
 
@@ -246,6 +247,65 @@ activity === {
             contentUrl: "https://example.com/sticker.webp"
         }
     ]
+}
+```
+
+
+### WhatsApp Template Message Activity
+
+Properties of all supported WhatsApp template message activities:
+* `channelData: any` (REQUIRED)
+* `channelData.contentType = "template"` (REQUIRED)
+* `channelData.template: WhatsAppTemplate` (REQUIRED) - a valid [WhatsAppTemplate](https://api.tyntec.com/reference/conversations/current.html)
+  object
+* `text = undefined` (DISALLOWED)
+* `attachments = undefined` (DISALLOWED)
+
+The template must be up to 1024 characters long.
+
+A WhatsApp template message activity example:
+
+```javascript
+activity === {
+    type: "message",
+    channelId: "whatsapp",
+    id: "77185196-664a-43ec-b14a-fe97036c697e",
+    timestamp: new Date("2019-06-26T09:41:00.000Z"),
+    from: {
+        id: "+1233423454"
+    },
+    recipient: {
+        id: "545345345"
+    },
+    conversation: {
+        id: "+1233423454",
+        isGroup: false,
+        name: "John Doe"
+    },
+    channelData: {
+        contentType: "template",
+        template: {
+            templateId: "template_id",
+            templateLanguage: "en",
+            components: {
+                header: [
+                    {
+                        type: "image",
+                        image: {
+                            url: "https://example.com/image.png"
+                        }
+                    }
+                ],
+                body: [
+                    {
+                        type: "text",
+                        text: "lorem"
+                    }
+                ]
+            }
+        }
+    },
+    serviceUrl: "https://api.tyntec.com/conversations/v3/messages"
 }
 ```
 
