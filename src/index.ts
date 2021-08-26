@@ -108,7 +108,7 @@ export class TyntecWhatsAppAdapter extends BotAdapter {
             console.warn(`TyntecWhatsAppAdapter: Activity.entities not supported: ${activity.entities}`);
         }
         if (activity.expiration !== undefined) {
-            throw Error(`TyntecWhatsAppAdapter: Activity.expiration not supported: ${activity.expiration}`);
+            console.warn(`TyntecWhatsAppAdapter: Activity.expiration not supported: ${activity.expiration}`);
         }
         if (activity.from === undefined) {
             throw Error(`TyntecWhatsAppAdapter: Activity.from is required: ${activity.from}`);
@@ -117,7 +117,7 @@ export class TyntecWhatsAppAdapter extends BotAdapter {
             console.warn(`TyntecWhatsAppAdapter: Activity.id not supported: ${activity.id}`);
         }
         if (activity.importance !== undefined) {
-            throw Error(`TyntecWhatsAppAdapter: Activity.importance not supported: ${activity.importance}`);
+            console.warn(`TyntecWhatsAppAdapter: Activity.importance not supported: ${activity.importance}`);
         }
         if (activity.inputHint !== undefined) {
             throw Error(`TyntecWhatsAppAdapter: Activity.inputHint not supported: ${activity.inputHint}`);
@@ -138,7 +138,7 @@ export class TyntecWhatsAppAdapter extends BotAdapter {
             throw Error(`TyntecWhatsAppAdapter: Activity.speak not supported: ${activity.speak}`);
         }
         if (activity.suggestedActions !== undefined) {
-            throw Error(`TyntecWhatsAppAdapter: Activity.suggestedActions not supported: ${activity.suggestedActions}`);
+            console.warn(`TyntecWhatsAppAdapter: Activity.suggestedActions not supported: ${activity.suggestedActions}`);
         }
         if (activity.textFormat !== undefined) {
             throw Error(`TyntecWhatsAppAdapter: Activity.textFormat not supported: ${activity.textFormat}`);
