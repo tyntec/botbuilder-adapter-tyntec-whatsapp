@@ -3,10 +3,19 @@
 `TyntecWhatsAppAdapter` is an implementation of a bot adapter that connects a
 bot to WhatsApp through the tyntec Conversations API.
 
+Properties:
+* [`public axiosInstance: AxiosInstance`](#public-axiosinstance-axiosinstance)
+
 Methods:
 * [`public constructor(settings: ITyntecWhatsAppAdapterSettings)`](#public-constructorsettings-ityntecwhatsappadaptersettings)
 
 If you want more information about bot adapters, see the [Microsoft Bot Framework SDK documentation](https://docs.microsoft.com/en-us/azure/bot-service/index-bf-sdk).
+
+
+## `public axiosInstance: AxiosInstance`
+
+Is an [Axios instance](https://github.com/axios/axios) used to send requests to
+the tyntec Conversations API.
 
 
 ## `public constructor(settings: ITyntecWhatsAppAdapterSettings)`
