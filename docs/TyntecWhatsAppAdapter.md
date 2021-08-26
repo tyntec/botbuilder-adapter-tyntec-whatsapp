@@ -6,6 +6,7 @@ bot to WhatsApp through the tyntec Conversations API.
 Properties:
 * [`public axiosInstance: AxiosInstance`](#public-axiosinstance-axiosinstance)
 * [`public maxBodySize: number`](#public-maxbodysize-number)
+* [`public onTurnError?: (context: TurnContext, error: Error) => Promise<void>`](#public-onturnerror-context-turncontext-error-error--promisevoid)
 * [`public tyntecApikey: string`](#public-tyntecapikey-string)
 
 Methods:
@@ -24,6 +25,13 @@ the tyntec Conversations API.
 ## `public maxBodySize: number`
 
 Is the maximum size of the request body accepted in `processActivity`.
+
+
+## `public onTurnError?: (context: TurnContext, error: Error) => Promise<void>`
+
+Is an optional asynchronous error handler that can catch exceptions in the
+middleware or application. The handler gets a `context` object for the turn and
+the thrown `error`.
 
 
 ## `public tyntecApikey: string`
