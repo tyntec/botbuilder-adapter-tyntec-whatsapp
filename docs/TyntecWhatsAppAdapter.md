@@ -5,6 +5,7 @@ bot to WhatsApp through the tyntec Conversations API.
 
 Properties:
 * [`public axiosInstance: AxiosInstance`](#public-axiosinstance-axiosinstance)
+* [`public maxBodySize: number`](#public-maxbodysize-number)
 
 Methods:
 * [`public constructor(settings: ITyntecWhatsAppAdapterSettings)`](#public-constructorsettings-ityntecwhatsappadaptersettings)
@@ -16,6 +17,11 @@ If you want more information about bot adapters, see the [Microsoft Bot Framewor
 
 Is an [Axios instance](https://github.com/axios/axios) used to send requests to
 the tyntec Conversations API.
+
+
+## `public maxBodySize: number`
+
+Is the maximum size of the request body accepted in `processActivity`.
 
 
 ## `public constructor(settings: ITyntecWhatsAppAdapterSettings)`
