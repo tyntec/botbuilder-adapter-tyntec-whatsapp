@@ -6,6 +6,7 @@ bot to WhatsApp through the tyntec Conversations API.
 Properties:
 * [`public axiosInstance: AxiosInstance`](#public-axiosinstance-axiosinstance)
 * [`public maxBodySize: number`](#public-maxbodysize-number)
+* [`public tyntecApikey: string`](#public-tyntecapikey-string)
 
 Methods:
 * [`public constructor(settings: ITyntecWhatsAppAdapterSettings)`](#public-constructorsettings-ityntecwhatsappadaptersettings)
@@ -22,6 +23,12 @@ the tyntec Conversations API.
 ## `public maxBodySize: number`
 
 Is the maximum size of the request body accepted in `processActivity`.
+
+
+## `public tyntecApikey: string`
+
+Is a [tyntec API key](https://www.tyntec.com/docs/faq-whatsapp-business-onboarding-how-can-i-get-api-key-setup-my-whatsapp-business-account)
+used to authenticate requests to the tyntec Conversations API.
 
 
 ## `public constructor(settings: ITyntecWhatsAppAdapterSettings)`
