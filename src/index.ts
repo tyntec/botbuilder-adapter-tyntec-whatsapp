@@ -56,7 +56,7 @@ export class TyntecWhatsAppAdapter extends BotAdapter {
                 });
             });
 
-            const activity = await this.parseTyntecWhatsAppMessageEvent(req.params, req.query, req.headers, requestBody);
+            const activity = await this.parseTyntecWhatsAppMessageEvent({body: requestBody, headers: req.headers, params: req.params, query: req.query});
             const context = new TurnContext(this as any, activity);
             await this.runMiddleware(context, logic);
 
@@ -284,53 +284,53 @@ export class TyntecWhatsAppAdapter extends BotAdapter {
         throw Error(`TyntecWhatsAppAdapter: invalid input: ${activity}`);
     }
 
-    protected async parseTyntecWhatsAppMessageEvent(params: any, query: any, headers: any, body: ITyntecMoMessage): Promise<Partial<Activity>> {
-        if (body.event !== "MoMessage") {
-            throw Error(`TyntecWhatsAppAdapter: ITyntecMoMessage.event other than MoMessage not supported: ${body.event}`)
+    protected async parseTyntecWhatsAppMessageEvent(req: {body: ITyntecMoMessage, headers: any, params: any, query: any}): Promise<Partial<Activity>> {
+        if (req.body.event !== "MoMessage") {
+            throw Error(`TyntecWhatsAppAdapter: ITyntecMoMessage.event other than MoMessage not supported: ${req.body.event}`)
         }
-        if (body.content.contentType === "media" && (body.content.media.type !== "audio" && body.content.media.type !== "document" && body.content.media.type !== "image" && body.content.media.type !== "sticker" && body.content.media.type !== "video")) {
-            throw Error(`TyntecWhatsAppAdapter: ITyntecMoMessage.content.media.type other than audio, document, image, sticker and video not supported: ${body.content.media.type}`);
+        if (req.body.content.contentType === "media" && (req.body.content.media.type !== "audio" && req.body.content.media.type !== "document" && req.body.content.media.type !== "image" && req.body.content.media.type !== "sticker" && req.body.content.media.type !== "video")) {
+            throw Error(`TyntecWhatsAppAdapter: ITyntecMoMessage.content.media.type other than audio, document, image, sticker and video not supported: ${req.body.content.media.type}`);
         }
-        if (body.groupId !== undefined) {
-            throw Error(`TyntecWhatsAppAdapter: ITyntecMoMessage.groupId not supported: ${body.groupId}`)
+        if (req.body.groupId !== undefined) {
+            throw Error(`TyntecWhatsAppAdapter: ITyntecMoMessage.groupId not supported: ${req.body.groupId}`)
         }
-        if (body.to === undefined) {
-            throw Error(`TyntecWhatsAppAdapter: ITyntecMoMessage.to is required: ${body.to}`)
+        if (req.body.to === undefined) {
+            throw Error(`TyntecWhatsAppAdapter: ITyntecMoMessage.to is required: ${req.body.to}`)
         }
 
         const tyntecSendWhatsAppMessageRequestConfig = composeTyntecSendWhatsAppMessageRequestConfig(this.tyntecApikey, {from: "example", to: "example", channel: "whatsapp", content: {contentType: "text", text: "example"}});
 
         const conversation: Partial<ConversationAccount> = {
-            id: body.from,
+            id: req.body.from,
             isGroup: false,
-            name: body.whatsapp?.senderName
+            name: req.body.whatsapp?.senderName
         };
         const from: Partial<ChannelAccount> = {
-            id: body.from,
-            name: body.whatsapp?.senderName
+            id: req.body.from,
+            name: req.body.whatsapp?.senderName
         };
         const recipient: Partial<ChannelAccount> = {
-            id: body.to
+            id: req.body.to
         };
         const activity: Partial<Activity> = {
             channelData: {},
-            channelId: body.channel,
+            channelId: req.body.channel,
             conversation: conversation as ConversationAccount,
             from: from as ChannelAccount,
-            id: body.messageId,
+            id: req.body.messageId,
             recipient: recipient as ChannelAccount,
-            replyToId: body.context?.messageId,
+            replyToId: req.body.context?.messageId,
             serviceUrl: tyntecSendWhatsAppMessageRequestConfig.url,
-            timestamp: body.timestamp !== undefined ? new Date(body.timestamp) : undefined,
+            timestamp: req.body.timestamp !== undefined ? new Date(req.body.timestamp) : undefined,
             type: ActivityTypes.Message
         };
-        if (body.content.contentType === "text") {
+        if (req.body.content.contentType === "text") {
             activity.channelData.contentType = "text";
-            activity.text = body.content.text;
+            activity.text = req.body.content.text;
             return activity;
         }
-        if (body.content.contentType === "media") {
-            const mediaRequest = composeTyntecRequestConfig("get", body.content.media.url, this.tyntecApikey, "*/*");
+        if (req.body.content.contentType === "media") {
+            const mediaRequest = composeTyntecRequestConfig("get", req.body.content.media.url, this.tyntecApikey, "*/*");
             mediaRequest.validateStatus = () => true;
             let mediaResponse;
             try{
@@ -342,13 +342,13 @@ export class TyntecWhatsAppAdapter extends BotAdapter {
             activity.attachments = [
                 {
                     contentType: mediaResponse.headers["content-type"],
-                    contentUrl: body.content.media.url
+                    contentUrl: req.body.content.media.url
                 }
             ];
-            activity.channelData.contentType = body.content.media.type;
-            activity.text = body.content.media.caption;
+            activity.channelData.contentType = req.body.content.media.type;
+            activity.text = req.body.content.media.caption;
             return activity;
         }
-        throw Error(`TyntecWhatsAppAdapter: invalid input: ${JSON.stringify(body)}`);
+        throw Error(`TyntecWhatsAppAdapter: invalid input: ${JSON.stringify(req.body)}`);
     }
 }

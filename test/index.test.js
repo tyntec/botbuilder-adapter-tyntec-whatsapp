@@ -420,7 +420,7 @@ describe("TyntecWhatsAppAdapter", function() {
                 "to": "545345345"
             };
 
-            const activity = await adapter.parseTyntecWhatsAppMessageEvent({}, {}, {}, body);
+            const activity = await adapter.parseTyntecWhatsAppMessageEvent({body, headers: {}, params: {}, query: {}});
 
             assert.deepStrictEqual(activity, {
                 channelData: { contentType: "text" },
@@ -475,7 +475,7 @@ describe("TyntecWhatsAppAdapter", function() {
                 "to": "545345345"
             };
 
-            const activity = await adapter.parseTyntecWhatsAppMessageEvent({}, {}, {}, body);
+            const activity = await adapter.parseTyntecWhatsAppMessageEvent({body, headers: {}, params: {}, query: {}});
 
             assert.deepStrictEqual(activity, {
                 attachments: [{"contentType": "audio/aac", "contentUrl": "https://example.com/audio.ac3"}],
@@ -531,7 +531,7 @@ describe("TyntecWhatsAppAdapter", function() {
                 "to": "545345345"
             };
 
-            const activity = await adapter.parseTyntecWhatsAppMessageEvent({}, {}, {}, body);
+            const activity = await adapter.parseTyntecWhatsAppMessageEvent({body, headers: {}, params: {}, query: {}});
 
             assert.deepStrictEqual(activity, {
                 attachments: [{"contentType": "application/pdf", "contentUrl": "https://example.com/document.pdf"}],
@@ -587,7 +587,7 @@ describe("TyntecWhatsAppAdapter", function() {
                 "to": "545345345"
             };
 
-            const activity = await adapter.parseTyntecWhatsAppMessageEvent({}, {}, {}, body);
+            const activity = await adapter.parseTyntecWhatsAppMessageEvent({body, headers: {}, params: {}, query: {}});
 
             assert.deepStrictEqual(activity, {
                 attachments: [{"contentType": "image/jpeg", "contentUrl": "https://example.com/image.png"}],
@@ -643,7 +643,7 @@ describe("TyntecWhatsAppAdapter", function() {
                 "to": "545345345"
             };
 
-            const activity = await adapter.parseTyntecWhatsAppMessageEvent({}, {}, {}, body);
+            const activity = await adapter.parseTyntecWhatsAppMessageEvent({body, headers: {}, params: {}, query: {}});
 
             assert.deepStrictEqual(activity, {
                 attachments: [{"contentType": "image/webp", "contentUrl": "https://example.com/sticker.webp"}],
@@ -699,7 +699,7 @@ describe("TyntecWhatsAppAdapter", function() {
                 "to": "545345345"
             };
 
-            const activity = await adapter.parseTyntecWhatsAppMessageEvent({}, {}, {}, body);
+            const activity = await adapter.parseTyntecWhatsAppMessageEvent({body, headers: {}, params: {}, query: {}});
 
             assert.deepStrictEqual(activity, {
                 attachments: [{"contentType": "video/mp4", "contentUrl": "https://example.com/video.mp4"}],
@@ -730,7 +730,7 @@ describe("TyntecWhatsAppAdapter", function() {
             };
 
             await assert.rejects(
-                adapter.parseTyntecWhatsAppMessageEvent({}, {}, {}, body)
+                adapter.parseTyntecWhatsAppMessageEvent({body, headers: {}, params: {}, query: {}})
             )
         });
 
@@ -753,7 +753,7 @@ describe("TyntecWhatsAppAdapter", function() {
             };
 
             await assert.rejects(
-                adapter.parseTyntecWhatsAppMessageEvent({}, {}, {}, body)
+                adapter.parseTyntecWhatsAppMessageEvent({body, headers: {}, params: {}, query: {}})
             )
         });
     });
