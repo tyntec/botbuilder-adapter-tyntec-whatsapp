@@ -1127,14 +1127,19 @@ describe("TyntecWhatsAppAdapter", function() {
                     axiosConfigs.push(config);
                     return {
                         status: 202,
-                        statusText: "",  // TODO
-                        headers: {},  // TODO
+                        statusText: "Accepted",
+                        headers: {
+                            "content-length": "94",
+                            "content-type": "application/json",
+                            "date": "Mon, 23 Aug 2021 08:35:10 GMT",
+                            "server": "nginx"
+                        },
                         data: {
                             "messageId": "77185196-664a-43ec-b14a-fe97036c697f",
-                            "acceptedAt": "2019-08-24T14:15:22Z"
+                            "timestamp": "2019-08-24T14:15:22.853817Z"
                         },
-                        config: {},  // TODO
-                        request: {}  // TODO
+                        config,
+                        request: {}
                     };
                 }
             };
@@ -1270,7 +1275,7 @@ describe("TyntecWhatsAppAdapter", function() {
 
         it("should throw an error when an unsuccessful response is returned", async function () {
             const axiosInstance = {
-                request: async () => {
+                request: async (config) => {
                     return {
                         status: 400,
                         statusText: "Bad Request",
@@ -1286,9 +1291,7 @@ describe("TyntecWhatsAppAdapter", function() {
                             "status": 400,
                             "detail": "Mandatory parameter [to] missing"
                         },
-                        config: {
-                            url: "https://example.com/channels/whatsapp/accounts"
-                        },
+                        config,
                         request: {}
                     };
                 }
