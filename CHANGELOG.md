@@ -6,5 +6,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Support for processing contacts messages to `TyntecWhatsAppAdapter#processActivity`.
 - Support for processing location messages to `TyntecWhatsAppAdapter#processActivity`.
 - Support for sending location messages to `TyntecWhatsAppAdapter#sendActivities`.

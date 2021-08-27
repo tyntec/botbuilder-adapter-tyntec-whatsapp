@@ -1,5 +1,46 @@
+export interface ITyntecAddress {
+    city?: string;
+    country?: string;
+    countryCode?: string;
+    state?: string;
+    street?: string;
+    type?: string;
+    zip?: string;
+}
+
 export interface ITyntecBaseMedia {
     url: string;
+}
+
+export interface ITyntecContact {
+    addresses?: ITyntecAddress[];
+    birthday?: string;
+    emails?: ITyntecEmail[];
+    ims?: ITyntecIMS[];
+    name?: ITyntecName;
+    org?: ITyntecOrganisation;
+    phones?: ITyntecContactPhone[];
+    urls?: ITyntecContactUrl[];
+}
+
+export interface ITyntecContactPhone {
+    phone?: string;
+    type?: string;
+}
+
+export interface ITyntecContactUrl {
+    type?: string;
+    url?: string;
+}
+
+export interface ITyntecEmail {
+    email?: string;
+    type?: string;
+}
+
+export interface ITyntecIMS {
+    service?: string;
+    userId?: string;
 }
 
 export interface ITyntecMediaMoContent {
@@ -22,7 +63,7 @@ export interface ITyntecMoContext {
 
 export interface ITyntecMoMessage {
     channel: string;
-    content: ITyntecMediaMoContent | ITyntecTextMoContent | ITyntecWhatsAppLocationContent;
+    content: ITyntecMediaMoContent | ITyntecTextMoContent | ITyntecWhatsAppContactsContent | ITyntecWhatsAppLocationContent;
     context?: ITyntecMoContext;
     event: "MoMessage";
     from: string;
@@ -38,6 +79,21 @@ export interface ITyntecTextMoContent {
     text: string;
 }
 
+export interface ITyntecName {
+    firstName?: string;
+    formattedName: string;
+    lastName?: string;
+    middleName?: string;
+    prefix?: string;
+    suffix?: string;
+}
+
+export interface ITyntecOrganisation {
+    company?: string;
+    department?: string;
+    title?: string;
+}
+
 export interface ITyntecWhatsapp {
     senderName?: string;
 }
@@ -45,6 +101,11 @@ export interface ITyntecWhatsapp {
 export interface ITyntecWhatsAppAudioContent {
     contentType: "audio";
     audio: ITyntecBaseMedia;
+}
+
+export interface ITyntecWhatsAppContactsContent {
+    contentType: "contacts";
+    contacts: ITyntecContact[];
 }
 
 export interface ITyntecWhatsAppDocument extends ITyntecBaseMedia {

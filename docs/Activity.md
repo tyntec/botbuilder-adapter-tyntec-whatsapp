@@ -47,6 +47,7 @@ Additional properties of channel WhatsApp message activities:
 * `conversation.isGroup = false` (REQUIRED)
 
 The supported WhatsApp messages are [audio](#whatsapp-audio-message-activity),
+[contacts](#whatsapp-contacts-message-activity),
 [document](#whatsapp-document-message-activity),
 [image](#whatsapp-image-message-activity),
 [location](#whatsapp-location-message-activity),
@@ -61,6 +62,7 @@ The supported WhatsApp messages are [audio](#whatsapp-audio-message-activity),
 Properties of all supported WhatsApp audio message activities:
 * `channelData: any` (REQUIRED)
 * `channelData.contentType = "audio"` (REQUIRED)
+* `channelData.contacts = undefined` (DISALLOWED)
 * `channelData.location = undefined` (DISALLOWED)
 * `channelData.template = undefined` (DISALLOWED)
 * `text = undefined` (DISALLOWED)
@@ -105,11 +107,60 @@ activity === {
 ```
 
 
+### WhatsApp Contacts Message Activity
+
+Properties of all supported WhatsApp contacts message activities:
+* `channelData: any` (REQUIRED)
+* `channelData.contentType = "contacts"` (REQUIRED)
+* `channelData.contacts: Contact` (REQUIRED) - a valid [Contact](https://api.tyntec.com/reference/conversations/current.html)
+  object
+* `channelData.location = undefined` (DISALLOWED)
+* `channelData.template = undefined` (DISALLOWED)
+* `text = undefined` (DISALLOWED)
+* `attachments = undefined` (DISALLOWED)
+
+A WhatsApp contacts message activity example:
+
+```javascript
+activity === {
+    type: "message",
+    channelId: "whatsapp",
+    id: "77185196-664a-43ec-b14a-fe97036c697e",
+    timestamp: new Date("2019-06-26T09:41:00.000Z"),
+    from: {
+        id: "+1233423454"
+    },
+    recipient: {
+        id: "545345345"
+    },
+    conversation: {
+        id: "+1233423454",
+        isGroup: false,
+        name: "John Doe"
+    },
+    channelData: {
+        contentType: "contacts",
+        contacts: [{
+            addresses: [{city: "Dortmund", type: "WORK"}],
+            emails: [{email: "whatsapp@tyntec.com", type: "WORK"}],
+            ims: [],
+            name: {firstName: "Peter", formattedName: "Peter Tyntec", lastName: "Tyntec"},
+            org: {},
+            phones: [{phone: "+49 231 477 90 813", type: "WORK"}],
+            urls: []
+        }]
+    },
+    serviceUrl: "https://api.tyntec.com/conversations/v3/messages"
+}
+```
+
+
 ### WhatsApp Document Message Activity
 
 Properties of all supported WhatsApp document message activities:
 * `channelData: any` (REQUIRED)
 * `channelData.contentType = "document"` (REQUIRED)
+* `channelData.contacts = undefined` (DISALLOWED)
 * `channelData.location = undefined` (DISALLOWED)
 * `channelData.template = undefined` (DISALLOWED)
 * `text?: string` (OPTIONAL) - the document caption
@@ -161,6 +212,7 @@ activity === {
 Properties of all supported WhatsApp image message activities:
 * `channelData: any` (REQUIRED)
 * `channelData.contentType = "image"` (REQUIRED)
+* `channelData.contacts = undefined` (DISALLOWED)
 * `channelData.location = undefined` (DISALLOWED)
 * `channelData.template = undefined` (DISALLOWED)
 * `text?: string` (OPTIONAL) - the image caption
@@ -211,6 +263,7 @@ activity === {
 Properties of all supported WhatsApp location message activities:
 * `channelData: any` (REQUIRED)
 * `channelData.contentType = "location"` (REQUIRED)
+* `channelData.contacts = undefined` (DISALLOWED)
 * `channelData.location: WhatsAppLocation` (REQUIRED) - a valid [WhatsAppLocation](https://api.tyntec.com/reference/conversations/current.html)
   object
 * `channelData.template = undefined` (DISALLOWED)
@@ -255,6 +308,7 @@ activity === {
 Properties of all supported WhatsApp sticker message activities:
 * `channelData: any` (REQUIRED)
 * `channelData.contentType = "sticker"` (REQUIRED)
+* `channelData.contacts = undefined` (DISALLOWED)
 * `channelData.location = undefined` (DISALLOWED)
 * `channelData.template = undefined` (DISALLOWED)
 * `text = undefined` (DISALLOWED)
@@ -305,6 +359,7 @@ activity === {
 Properties of all supported WhatsApp template message activities:
 * `channelData: any` (REQUIRED)
 * `channelData.contentType = "template"` (REQUIRED)
+* `channelData.contacts = undefined` (DISALLOWED)
 * `channelData.location = undefined` (DISALLOWED)
 * `channelData.template: WhatsAppTemplate` (REQUIRED) - a valid [WhatsAppTemplate](https://api.tyntec.com/reference/conversations/current.html)
   object
@@ -365,6 +420,7 @@ activity === {
 Properties of all supported WhatsApp text message activities:
 * `channelData: any` (REQUIRED)
 * `channelData.contentType = "text"` (REQUIRED)
+* `channelData.contacts = undefined` (DISALLOWED)
 * `channelData.location = undefined` (DISALLOWED)
 * `channelData.template = undefined` (DISALLOWED)
 * `text: string` (REQUIRED)
@@ -405,6 +461,7 @@ activity === {
 Properties of all supported WhatsApp video message activities:
 * `channelData: any` (REQUIRED)
 * `channelData.contentType = "video"` (REQUIRED)
+* `channelData.contacts = undefined` (DISALLOWED)
 * `channelData.location = undefined` (DISALLOWED)
 * `channelData.template = undefined` (DISALLOWED)
 * `text?: string` (OPTIONAL) - the video caption
