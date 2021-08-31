@@ -86,14 +86,21 @@ describe("parseTyntecSendWhatsAppMessageResponse", function() {
     it("should return the message ID when a successful response is present", function() {
         const response = {
             status: 202,
-            statusText: "",  // TODO
-            headers: {},  // TODO
+            statusText: "Accepted",
+            headers: {
+                "content-length": "94",
+                "content-type": "application/json",
+                "date": "Mon, 23 Aug 2021 08:35:10 GMT",
+                "server": "nginx"
+            },
             data: {
                 "messageId": "77185196-664a-43ec-b14a-fe97036c697f",
-                "acceptedAt": "2019-08-24T14:15:22Z"
+                "timestamp": "2019-08-24T14:15:22.853817Z"
             },
-            config: {},  // TODO
-            request: {}  // TODO
+            config: {
+                url: "https://example.com/channels/whatsapp/accounts"
+            },
+            request: {}
         };
 
         const messageId = parseTyntecSendWhatsAppMessageResponse(response);

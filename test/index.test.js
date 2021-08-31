@@ -420,7 +420,7 @@ describe("TyntecWhatsAppAdapter", function() {
                 "to": "545345345"
             };
 
-            const activity = await adapter.parseTyntecWhatsAppMessageEvent({}, {}, {}, body);
+            const activity = await adapter.parseTyntecWhatsAppMessageEvent({body, headers: {}, params: {}, query: {}});
 
             assert.deepStrictEqual(activity, {
                 channelData: { contentType: "text" },
@@ -475,7 +475,7 @@ describe("TyntecWhatsAppAdapter", function() {
                 "to": "545345345"
             };
 
-            const activity = await adapter.parseTyntecWhatsAppMessageEvent({}, {}, {}, body);
+            const activity = await adapter.parseTyntecWhatsAppMessageEvent({body, headers: {}, params: {}, query: {}});
 
             assert.deepStrictEqual(activity, {
                 attachments: [{"contentType": "audio/aac", "contentUrl": "https://example.com/audio.ac3"}],
@@ -531,7 +531,7 @@ describe("TyntecWhatsAppAdapter", function() {
                 "to": "545345345"
             };
 
-            const activity = await adapter.parseTyntecWhatsAppMessageEvent({}, {}, {}, body);
+            const activity = await adapter.parseTyntecWhatsAppMessageEvent({body, headers: {}, params: {}, query: {}});
 
             assert.deepStrictEqual(activity, {
                 attachments: [{"contentType": "application/pdf", "contentUrl": "https://example.com/document.pdf"}],
@@ -587,7 +587,7 @@ describe("TyntecWhatsAppAdapter", function() {
                 "to": "545345345"
             };
 
-            const activity = await adapter.parseTyntecWhatsAppMessageEvent({}, {}, {}, body);
+            const activity = await adapter.parseTyntecWhatsAppMessageEvent({body, headers: {}, params: {}, query: {}});
 
             assert.deepStrictEqual(activity, {
                 attachments: [{"contentType": "image/jpeg", "contentUrl": "https://example.com/image.png"}],
@@ -643,7 +643,7 @@ describe("TyntecWhatsAppAdapter", function() {
                 "to": "545345345"
             };
 
-            const activity = await adapter.parseTyntecWhatsAppMessageEvent({}, {}, {}, body);
+            const activity = await adapter.parseTyntecWhatsAppMessageEvent({body, headers: {}, params: {}, query: {}});
 
             assert.deepStrictEqual(activity, {
                 attachments: [{"contentType": "image/webp", "contentUrl": "https://example.com/sticker.webp"}],
@@ -699,7 +699,7 @@ describe("TyntecWhatsAppAdapter", function() {
                 "to": "545345345"
             };
 
-            const activity = await adapter.parseTyntecWhatsAppMessageEvent({}, {}, {}, body);
+            const activity = await adapter.parseTyntecWhatsAppMessageEvent({body, headers: {}, params: {}, query: {}});
 
             assert.deepStrictEqual(activity, {
                 attachments: [{"contentType": "video/mp4", "contentUrl": "https://example.com/video.mp4"}],
@@ -730,7 +730,7 @@ describe("TyntecWhatsAppAdapter", function() {
             };
 
             await assert.rejects(
-                adapter.parseTyntecWhatsAppMessageEvent({}, {}, {}, body)
+                adapter.parseTyntecWhatsAppMessageEvent({body, headers: {}, params: {}, query: {}})
             )
         });
 
@@ -753,7 +753,7 @@ describe("TyntecWhatsAppAdapter", function() {
             };
 
             await assert.rejects(
-                adapter.parseTyntecWhatsAppMessageEvent({}, {}, {}, body)
+                adapter.parseTyntecWhatsAppMessageEvent({body, headers: {}, params: {}, query: {}})
             )
         });
     });
@@ -1033,90 +1033,90 @@ describe("TyntecWhatsAppAdapter", function() {
             assert.strictEqual(res.statusCode, 500);
             assert.strictEqual(res.endCalled, true);
         });
-    });
 
-    it("should fail gracefully when no error handler is present", async function () {
-        const req = new WebRequestStub({
-            method: "POST",
-            headers: {
-                "host": "example.com",
-                "content-length": "229",
-                "content-type": "application/json",
-                "accept": "*/*"
-            }
-        });
-        const res = new WebResponseStub();
-        const adapter = new TyntecWhatsAppAdapter({
-            axiosInstance: axios.create(),
-            tyntecApikey: "ABcdefGhI1jKLMNOPQRst2UVWx345yz6"
-        });
-        adapter.use(async () => {
-            throw new Error();
+        it("should fail gracefully when no error handler is present", async function () {
+            const req = new WebRequestStub({
+                method: "POST",
+                headers: {
+                    "host": "example.com",
+                    "content-length": "229",
+                    "content-type": "application/json",
+                    "accept": "*/*"
+                }
+            });
+            const res = new WebResponseStub();
+            const adapter = new TyntecWhatsAppAdapter({
+                axiosInstance: axios.create(),
+                tyntecApikey: "ABcdefGhI1jKLMNOPQRst2UVWx345yz6"
+            });
+            adapter.use(async () => {
+                throw new Error();
+            });
+
+            const promise = adapter.processActivity(req, res, () => null);
+
+            req.emit("data", "{\"channel\":\"whatsapp\",\"content\":{\"contentType\":\"text\",\"text\":\"A simple text message\"},\"event\":\"MoMessage\",\"from\":");
+            req.emit("data", "\"+1233423454\",\"messageId\":\"77185196-664a-43ec-b14a-fe97036c697e\",\"timestamp\":\"2019-06-26T11:41:00\",\"to\":\"545345345\"}");
+            req.emit("end");
+            await promise;
+            assert.strictEqual(res.statusCode, 500);
+            assert.strictEqual(res.endCalled, true);
         });
 
-        const promise = adapter.processActivity(req, res, () => null);
-
-        req.emit("data", "{\"channel\":\"whatsapp\",\"content\":{\"contentType\":\"text\",\"text\":\"A simple text message\"},\"event\":\"MoMessage\",\"from\":");
-        req.emit("data", "\"+1233423454\",\"messageId\":\"77185196-664a-43ec-b14a-fe97036c697e\",\"timestamp\":\"2019-06-26T11:41:00\",\"to\":\"545345345\"}");
-        req.emit("end");
-        await promise;
-        assert.strictEqual(res.statusCode, 500);
-        assert.strictEqual(res.endCalled, true);
-    });
-
-    it("should call the error handler when present", async function () {
-        let errorHandlerArguments = undefined;
-        const error = new Error();
-        const req = new WebRequestStub({
-            method: "POST",
-            headers: {
-                "host": "example.com",
-                "content-length": "229",
-                "content-type": "application/json",
-                "accept": "*/*"
-            }
-        });
-        const res = new WebResponseStub();
-        const adapter = new TyntecWhatsAppAdapter({
-            axiosInstance: axios.create(),
-            tyntecApikey: "ABcdefGhI1jKLMNOPQRst2UVWx345yz6"
-        });
-        adapter.onTurnError = async (context, error) => {
-            errorHandlerArguments = {
-                context: {
-                    activity: context.activity,
-                    adapter: context.adapter
-                },
-                error
+        it("should call the error handler when present", async function () {
+            let errorHandlerArguments = undefined;
+            const error = new Error();
+            const req = new WebRequestStub({
+                method: "POST",
+                headers: {
+                    "host": "example.com",
+                    "content-length": "229",
+                    "content-type": "application/json",
+                    "accept": "*/*"
+                }
+            });
+            const res = new WebResponseStub();
+            const adapter = new TyntecWhatsAppAdapter({
+                axiosInstance: axios.create(),
+                tyntecApikey: "ABcdefGhI1jKLMNOPQRst2UVWx345yz6"
+            });
+            adapter.onTurnError = async (context, error) => {
+                errorHandlerArguments = {
+                    context: {
+                        activity: context.activity,
+                        adapter: context.adapter
+                    },
+                    error
+                };
             };
-        };
-        adapter.use(async () => {
-            throw error;
-        });
+            adapter.use(async () => {
+                throw error;
+            });
 
-        const promise = adapter.processActivity(req, res, () => null);
+            const promise = adapter.processActivity(req, res, () => null);
 
-        req.emit("data", "{\"channel\":\"whatsapp\",\"content\":{\"contentType\":\"text\",\"text\":\"A simple text message\"},\"event\":\"MoMessage\",\"from\":");
-        req.emit("data", "\"+1233423454\",\"messageId\":\"77185196-664a-43ec-b14a-fe97036c697e\",\"timestamp\":\"2019-06-26T11:41:00\",\"to\":\"545345345\"}");
-        req.emit("end");
-        await promise;
-        assert.deepStrictEqual(errorHandlerArguments.context.activity, {
-            channelData: { contentType: "text" },
-            channelId: "whatsapp",
-            conversation: { id: "+1233423454", isGroup: false, name: undefined },
-            from: { id: "+1233423454", name: undefined },
-            id: "77185196-664a-43ec-b14a-fe97036c697e",
-            recipient: { id: "545345345" },
-            replyToId: undefined,
-            serviceUrl: "https://api.tyntec.com/conversations/v3/messages",
-            text: "A simple text message",
-            timestamp: new Date("2019-06-26T09:41:00.000Z"),
-            type: "message"
+            req.emit("data", "{\"channel\":\"whatsapp\",\"content\":{\"contentType\":\"text\",\"text\":\"A simple text message\"},\"event\":\"MoMessage\",\"from\":");
+            req.emit("data", "\"+1233423454\",\"messageId\":\"77185196-664a-43ec-b14a-fe97036c697e\",\"timestamp\":\"2019-06-26T11:41:00\",\"to\":\"545345345\"}");
+            req.emit("end");
+            await promise;
+            assert.deepStrictEqual(errorHandlerArguments.context.activity, {
+                channelData: { contentType: "text" },
+                channelId: "whatsapp",
+                conversation: { id: "+1233423454", isGroup: false, name: undefined },
+                from: { id: "+1233423454", name: undefined },
+                id: "77185196-664a-43ec-b14a-fe97036c697e",
+                recipient: { id: "545345345" },
+                replyToId: undefined,
+                serviceUrl: "https://api.tyntec.com/conversations/v3/messages",
+                text: "A simple text message",
+                timestamp: new Date("2019-06-26T09:41:00.000Z"),
+                type: "message"
+            });
+            assert.strictEqual(errorHandlerArguments.context.adapter, adapter);
+            assert.strictEqual(errorHandlerArguments.error, error);
+            assert.strictEqual(res.statusCode, 200);
+            assert.strictEqual(res.endCalled, true);
         });
-        assert.strictEqual(errorHandlerArguments.context.adapter, adapter);
-        assert.strictEqual(errorHandlerArguments.error, error);
-        assert.strictEqual(res.statusCode, 200);
-        assert.strictEqual(res.endCalled, true);
     });
 
     describe("#sendActivities", function () {
@@ -1127,14 +1127,19 @@ describe("TyntecWhatsAppAdapter", function() {
                     axiosConfigs.push(config);
                     return {
                         status: 202,
-                        statusText: "",  // TODO
-                        headers: {},  // TODO
+                        statusText: "Accepted",
+                        headers: {
+                            "content-length": "94",
+                            "content-type": "application/json",
+                            "date": "Mon, 23 Aug 2021 08:35:10 GMT",
+                            "server": "nginx"
+                        },
                         data: {
                             "messageId": "77185196-664a-43ec-b14a-fe97036c697f",
-                            "acceptedAt": "2019-08-24T14:15:22Z"
+                            "timestamp": "2019-08-24T14:15:22.853817Z"
                         },
-                        config: {},  // TODO
-                        request: {}  // TODO
+                        config,
+                        request: {}
                     };
                 }
             };
@@ -1270,7 +1275,7 @@ describe("TyntecWhatsAppAdapter", function() {
 
         it("should throw an error when an unsuccessful response is returned", async function () {
             const axiosInstance = {
-                request: async () => {
+                request: async (config) => {
                     return {
                         status: 400,
                         statusText: "Bad Request",
@@ -1286,9 +1291,7 @@ describe("TyntecWhatsAppAdapter", function() {
                             "status": 400,
                             "detail": "Mandatory parameter [to] missing"
                         },
-                        config: {
-                            url: "https://example.com/channels/whatsapp/accounts"
-                        },
+                        config,
                         request: {}
                     };
                 }
