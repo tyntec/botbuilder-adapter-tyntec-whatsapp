@@ -71,10 +71,13 @@ is supported. These are events that meet the following criteria:
 * The event must not be a group message (`body.to !== undefined && body.groupId === undefined`).
 * The event must be a text message (`body.content.contentType === "text"`),
   an audio message (`body.content.contentType === "media" && body.content.media.type === "audio"`),
+  a contacts message (`body.content.contentType === "contacts"`),
   a document message (`body.content.contentType === "media" && body.content.media.type === "document"`),
   an image message (`body.content.contentType === "media" && body.content.media.type === "image"`),
-  a sticker message (`body.content.contentType === "media" && body.content.media.type === "sticker"`) or
-  a video message (`body.content.contentType === "media" && body.content.media.type === "video"`).
+  a location message (`body.content.contentType === "location"`),
+  a sticker message (`body.content.contentType === "media" && body.content.media.type === "sticker"`),
+  a video message (`body.content.contentType === "media" && body.content.media.type === "video"`) or
+  a voice message (`body.content.contentType === "media" && body.content.media.type === "voice"`).
 
 Supported events are turned into activities that are passed to the created turn
 contexts. See [Activity.md](./Activity.md) to find out what activities may be
@@ -98,7 +101,18 @@ Returns an array of objects of `ResourceResponse` type containing IDs of the
 delivered messages.
 
 See [Activity.md](./Activity.md) to find out what activities may be passed to
-`sendActivities`.
+`sendActivities`. The supported activities are:
+
+* WhatsApp audio message activities,
+* WhatsApp contacts message activities,
+* WhatsApp document message activities,
+* WhatsApp image message activities,
+* WhatsApp interactive message activities,
+* WhatsApp location message activities,
+* WhatsApp sticker message activities,
+* WhatsApp template message activities,
+* WhatsApp text message activities and
+* WhatsApp video message activities.
 
 
 ## `public use(...middlewares: (MiddlewareHandler | Middleware)[]): TyntecWhatsAppAdapter`

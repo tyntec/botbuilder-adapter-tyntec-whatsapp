@@ -115,6 +115,51 @@ describe("TyntecWhatsAppAdapter", function() {
             });
         });
 
+        it("should compose a contacts message request", function () {
+            const adapter = new TyntecWhatsAppAdapter({
+                axiosInstance: axios.create(),
+                tyntecApikey: "ABcdefGhI1jKLMNOPQRst2UVWx345yz6"
+            });
+            const activity =  {
+                type: ActivityTypes.Message,
+                channelId: "whatsapp",
+                from: { id: "+1233423454" },
+                conversation: { id: "545345345" },
+                channelData: {
+                    contentType: "contacts",
+                    contacts: [{
+                        addresses: [{city: "Dortmund", type: "WORK"}],
+                        emails: [{email: "whatsapp@tyntec.com", type: "WORK"}],
+                        ims: [],
+                        name: {firstName: "Peter", formattedName: "Peter Tyntec", lastName: "Tyntec"},
+                        org: {},
+                        phones: [{phone: "+49 231 477 90 813", type: "WORK"}],
+                        urls: []
+                    }]
+                }
+            };
+
+            const messageRequest = adapter.composeTyntecWhatsAppMessageRequest(activity);
+
+            assert.deepStrictEqual(messageRequest, {
+                from: "+1233423454",
+                to: "545345345",
+                channel: "whatsapp",
+                content: {
+                    contentType: "contacts",
+                    contacts: [{
+                        addresses: [{city: "Dortmund", type: "WORK"}],
+                        emails: [{email: "whatsapp@tyntec.com", type: "WORK"}],
+                        ims: [],
+                        name: {firstName: "Peter", formattedName: "Peter Tyntec", lastName: "Tyntec"},
+                        org: {},
+                        phones: [{phone: "+49 231 477 90 813", type: "WORK"}],
+                        urls: []
+                    }]
+                }
+            });
+        });
+
         it("should compose a document message request", function () {
             const adapter = new TyntecWhatsAppAdapter({
                 axiosInstance: axios.create(),
@@ -153,6 +198,53 @@ describe("TyntecWhatsAppAdapter", function() {
             });
         });
 
+        it("should compose an interactive message request", function () {
+            const adapter = new TyntecWhatsAppAdapter({
+                axiosInstance: axios.create(),
+                tyntecApikey: "ABcdefGhI1jKLMNOPQRst2UVWx345yz6"
+            });
+            const activity =  {
+                type: ActivityTypes.Message,
+                channelId: "whatsapp",
+                from: { id: "+1233423454" },
+                conversation: { id: "545345345" },
+                channelData: {
+                    contentType: "interactive",
+                    interactive: {
+                        type: "buttons",
+                        components: {
+                            body: {type: "text", text: "How would you rate your bot experience"},
+                            buttons: [{
+                                type: "reply",
+                                reply: {payload: "9080923445nlkjß0_gß0923845083245dfg", title: "Good"}
+                            }]
+                        }
+                    }
+                }
+            };
+
+            const messageRequest = adapter.composeTyntecWhatsAppMessageRequest(activity);
+
+            assert.deepStrictEqual(messageRequest, {
+                from: "+1233423454",
+                to: "545345345",
+                channel: "whatsapp",
+                content: {
+                    contentType: "interactive",
+                    interactive: {
+                        type: "buttons",
+                        components: {
+                            body: {type: "text", text: "How would you rate your bot experience"},
+                            buttons: [{
+                                type: "reply",
+                                reply: {payload: "9080923445nlkjß0_gß0923845083245dfg", title: "Good"}
+                            }]
+                        }
+                    }
+                }
+            });
+        });
+
         it("should compose an image message request", function () {
             const adapter = new TyntecWhatsAppAdapter({
                 axiosInstance: axios.create(),
@@ -184,6 +276,45 @@ describe("TyntecWhatsAppAdapter", function() {
                     image: {
                         caption: "An image caption",
                         url: "https://example.com/image.png"
+                    }
+                }
+            });
+        });
+
+        it("should compose a location message request", function () {
+            const adapter = new TyntecWhatsAppAdapter({
+                axiosInstance: axios.create(),
+                tyntecApikey: "ABcdefGhI1jKLMNOPQRst2UVWx345yz6"
+            });
+            const activity =  {
+                type: ActivityTypes.Message,
+                channelId: "whatsapp",
+                from: { id: "+1233423454" },
+                conversation: { id: "545345345" },
+                channelData: {
+                    contentType: "location",
+                    location: {
+                        address: "tyntec GmbH, Semerteichstraße, Dortmund",
+                        latitude: 51.5005765,
+                        longitude: 7.4954884,
+                        name: "tyntec GmbH"
+                    }
+                }
+            };
+
+            const messageRequest = adapter.composeTyntecWhatsAppMessageRequest(activity);
+
+            assert.deepStrictEqual(messageRequest, {
+                from: "+1233423454",
+                to: "545345345",
+                channel: "whatsapp",
+                content: {
+                    contentType: "location",
+                    location: {
+                        address: "tyntec GmbH, Semerteichstraße, Dortmund",
+                        latitude: 51.5005765,
+                        longitude: 7.4954884,
+                        name: "tyntec GmbH"
                     }
                 }
             });
@@ -493,6 +624,59 @@ describe("TyntecWhatsAppAdapter", function() {
             });
         });
 
+        it("should parse a contacts message event", async function() {
+            const adapter = new TyntecWhatsAppAdapter({
+                axiosInstance: axios.create(),
+                tyntecApikey: "ABcdefGhI1jKLMNOPQRst2UVWx345yz6"
+            });
+            const body = {
+                "channel": "whatsapp",
+                "content": {
+                    "contentType": "contacts",
+                    "contacts": [{
+                        "addresses": [{"city": "Dortmund", "type": "WORK"}],
+                        "emails": [{"email": "whatsapp@tyntec.com", "type": "WORK"}],
+                        "ims": [],
+                        "name": {"firstName": "Peter", "formattedName": "Peter Tyntec", "lastName": "Tyntec"},
+                        "org": {},
+                        "phones": [{"phone": "+49 231 477 90 813", "type": "WORK"}],
+                        "urls": []
+                    }]
+                },
+                "event": "MoMessage",
+                "from": "+1233423454",
+                "messageId": "77185196-664a-43ec-b14a-fe97036c697e",
+                "timestamp": "2019-06-26T11:41:00",
+                "to": "545345345"
+            };
+
+            const activity = await adapter.parseTyntecWhatsAppMessageEvent({body, headers: {}, params: {}, query: {}});
+
+            assert.deepStrictEqual(activity, {
+                channelData: {
+                    contentType: "contacts",
+                    contacts: [{
+                        "addresses": [{"city": "Dortmund", "type": "WORK"}],
+                        "emails": [{"email": "whatsapp@tyntec.com", "type": "WORK"}],
+                        "ims": [],
+                        "name": {"firstName": "Peter", "formattedName": "Peter Tyntec", "lastName": "Tyntec"},
+                        "org": {},
+                        "phones": [{"phone": "+49 231 477 90 813", "type": "WORK"}],
+                        "urls": []
+                    }]
+                },
+                channelId: "whatsapp",
+                conversation: { id: "+1233423454", isGroup: false, name: undefined },
+                from: { id: "+1233423454", name: undefined },
+                id: "77185196-664a-43ec-b14a-fe97036c697e",
+                recipient: { id: "545345345" },
+                replyToId: undefined,
+                serviceUrl: "https://api.tyntec.com/conversations/v3/messages",
+                timestamp: new Date("2019-06-26T09:41:00.000Z"),
+                type: "message"
+            });
+        });
+
         it("should parse a document message event", async function() {
             const axiosInstance = {
                 request: async (config) => {
@@ -600,6 +784,48 @@ describe("TyntecWhatsAppAdapter", function() {
                 replyToId: undefined,
                 serviceUrl: "https://api.tyntec.com/conversations/v3/messages",
                 text: undefined,
+                timestamp: new Date("2019-06-26T09:41:00.000Z"),
+                type: "message"
+            });
+        });
+
+        it("should parse a location message event", async function() {
+            const adapter = new TyntecWhatsAppAdapter({
+                axiosInstance: axios.create(),
+                tyntecApikey: "ABcdefGhI1jKLMNOPQRst2UVWx345yz6"
+            });
+            const body = {
+                "channel": "whatsapp",
+                "content": {
+                    "contentType": "location",
+                    "location": {
+                        "address": "tyntec GmbH, Semerteichstraße, Dortmund",
+                        "latitude": 51.5005765,
+                        "longitude": 7.4954884,
+                        "name": "tyntec GmbH"
+                    }
+                },
+                "event": "MoMessage",
+                "from": "+1233423454",
+                "messageId": "77185196-664a-43ec-b14a-fe97036c697e",
+                "timestamp": "2019-06-26T11:41:00",
+                "to": "545345345"
+            };
+
+            const activity = await adapter.parseTyntecWhatsAppMessageEvent({body, headers: {}, params: {}, query: {}});
+
+            assert.deepStrictEqual(activity, {
+                channelData: {
+                    contentType: "location",
+                    location: { address: "tyntec GmbH, Semerteichstraße, Dortmund", latitude: 51.5005765, longitude: 7.4954884, name: "tyntec GmbH" }
+                },
+                channelId: "whatsapp",
+                conversation: { id: "+1233423454", isGroup: false, name: undefined },
+                from: { id: "+1233423454", name: undefined },
+                id: "77185196-664a-43ec-b14a-fe97036c697e",
+                recipient: { id: "545345345" },
+                replyToId: undefined,
+                serviceUrl: "https://api.tyntec.com/conversations/v3/messages",
                 timestamp: new Date("2019-06-26T09:41:00.000Z"),
                 type: "message"
             });
@@ -717,6 +943,62 @@ describe("TyntecWhatsAppAdapter", function() {
             });
         });
 
+        it("should parse an audio message event", async function() {
+            const axiosInstance = {
+                request: async (config) => {
+                    return {
+                        status: 200,
+                        statusText: "OK",
+                        headers: {
+                            "content-length": "7000",
+                            "content-type": "audio/ogg; codecs=opus",
+                            "date": "Mon, 23 Aug 2021 08:35:10 GMT",
+                            "server": "nginx"
+                        },
+                        data: "",
+                        config,
+                        request: {}
+                    };
+                }
+            };
+            const adapter = new TyntecWhatsAppAdapter({
+                axiosInstance,
+                tyntecApikey: "ABcdefGhI1jKLMNOPQRst2UVWx345yz6"
+            });
+            const body = {
+                "channel": "whatsapp",
+                "content": {
+                    "contentType": "media",
+                    "media": {
+                        "type": "voice",
+                        "url": "https://example.com/voice.ogg"
+                    }
+                },
+                "event": "MoMessage",
+                "from": "+1233423454",
+                "messageId": "77185196-664a-43ec-b14a-fe97036c697e",
+                "timestamp": "2019-06-26T11:41:00",
+                "to": "545345345"
+            };
+
+            const activity = await adapter.parseTyntecWhatsAppMessageEvent({body, headers: {}, params: {}, query: {}});
+
+            assert.deepStrictEqual(activity, {
+                attachments: [{"contentType": "audio/ogg; codecs=opus", "contentUrl": "https://example.com/voice.ogg"}],
+                channelData: { contentType: "voice" },
+                channelId: "whatsapp",
+                conversation: { id: "+1233423454", isGroup: false, name: undefined },
+                from: { id: "+1233423454", name: undefined },
+                id: "77185196-664a-43ec-b14a-fe97036c697e",
+                recipient: { id: "545345345" },
+                replyToId: undefined,
+                serviceUrl: "https://api.tyntec.com/conversations/v3/messages",
+                text: undefined,
+                timestamp: new Date("2019-06-26T09:41:00.000Z"),
+                type: "message"
+            });
+        });
+
         it("should throw an error when an event is not supported", async function () {
             const adapter = new TyntecWhatsAppAdapter({
                 axiosInstance: axios.create(),
@@ -742,7 +1024,7 @@ describe("TyntecWhatsAppAdapter", function() {
             const body = {
                 "channel": "whatsapp",
                 "content": {
-                    "contentType": "location"
+                    "contentType": "foo"
                     // TODO
                 },
                 "event": "MoMessage",
