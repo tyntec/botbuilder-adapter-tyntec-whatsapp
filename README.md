@@ -29,6 +29,8 @@ server.post('/api/messages', (req, res) => {
 });
 ```
 
+You can find the full quick start guide in the [tyntec Docs Center](https://www.tyntec.com/docs/whatsapp-business-api-integration-microsoft-bot-framework).
+
 
 ## Installation
 
