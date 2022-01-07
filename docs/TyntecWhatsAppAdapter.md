@@ -15,7 +15,7 @@ Methods:
 * [`public sendActivities(context: TurnContext, activities: Partial<Activity>[]): Promise<ResourceResponse[]>`](#public-sendactivitiescontext-turncontext-activities-partialactivity-promiseresourceresponse)
 * [`public use(...middlewares: (MiddlewareHandler | Middleware)[]): TyntecWhatsAppAdapter`](#public-usemiddlewares-middlewarehandler--middleware-tyntecwhatsappadapter)
 * [`protected parseTyntecWebhookRequest(req: {body: ITyntecAPIEvent, headers: any, params: any, query: any}): Promise<Partial<Activity>>`](#protected-parsetyntecwebhookrequestreq-body-ityntecapievent-headers-any-params-any-query-any-promisepartialactivity)
-* [`protected parseTyntecWhatsAppMessageEvent(params: any, query: any, headers: any, body: ITyntecMoMessage): Promise<Partial<Activity>>`](#protected-parsetyntecwhatsappmessageeventreq-body-ityntecmomessage-headers-any-params-any-query-any-promisepartialactivity)
+* [`protected parseTyntecWhatsAppMessageEvent(req: {body: ITyntecMoMessage, headers: any, params: any, query: any}): Promise<Partial<Activity>>`](#protected-parsetyntecwhatsappmessageeventreq-body-ityntecmomessage-headers-any-params-any-query-any-promisepartialactivity)
 
 If you want more information about bot adapters, see the [Microsoft Bot Framework SDK documentation](https://docs.microsoft.com/en-us/azure/bot-service/index-bf-sdk).
 
