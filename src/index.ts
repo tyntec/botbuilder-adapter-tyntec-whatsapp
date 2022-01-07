@@ -401,8 +401,13 @@ export class TyntecWhatsAppAdapter extends BotAdapter {
         throw Error(`TyntecWhatsAppAdapter: invalid input: ${activity}`);
     }
 
+    // Deprecated since version 1.3.0. Use parseTyntecWebhookRequest instead.
     protected async parseTyntecWhatsAppMessageEvent(req: {body: ITyntecMoMessage, headers: any, params: any, query: any}): Promise<Partial<Activity>> {
-        return this.parseTyntecWebhookWhatsAppMoMessage(req.body);
+        return this.parseTyntecWebhookRequest(req);
+    }
+
+    protected async parseTyntecWebhookRequest(req: {body: ITyntecAPIEvent, headers: any, params: any, query: any}): Promise<Partial<Activity>> {
+        return this.parseTyntecWebhookWhatsAppMoMessage(req.body as ITyntecMoMessage);
     }
 
     protected async parseTyntecWebhookWhatsAppMoMessage(message: ITyntecMoMessage): Promise<Partial<Activity>> {
