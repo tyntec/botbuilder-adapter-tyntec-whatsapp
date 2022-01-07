@@ -52,6 +52,7 @@ The supported WhatsApp messages are [audio](#whatsapp-audio-message-activity),
 [image](#whatsapp-image-message-activity),
 [interactive](#whatsapp-interactive-message-activity),
 [location](#whatsapp-location-message-activity),
+[postback](#whatsapp-postback-message-activity),
 [sticker](#whatsapp-sticker-message-activity),
 [template](#whatsapp-template-message-activity),
 [text](#whatsapp-text-message-activity),
@@ -67,6 +68,7 @@ Properties of all supported WhatsApp audio message activities:
 * `channelData.contacts = undefined` (DISALLOWED)
 * `channelData.interactive = undefined` (DISALLOWED)
 * `channelData.location = undefined` (DISALLOWED)
+* `channelData.postback = undefined` (DISALLOWED)
 * `channelData.template = undefined` (DISALLOWED)
 * `text = undefined` (DISALLOWED)
 * `attachments: Attachment[]` (REQUIRED) - exactly one attachment is required
@@ -119,6 +121,7 @@ Properties of all supported WhatsApp contacts message activities:
   object
 * `channelData.interactive = undefined` (DISALLOWED)
 * `channelData.location = undefined` (DISALLOWED)
+* `channelData.postback = undefined` (DISALLOWED)
 * `channelData.template = undefined` (DISALLOWED)
 * `text = undefined` (DISALLOWED)
 * `attachments = undefined` (DISALLOWED)
@@ -167,6 +170,7 @@ Properties of all supported WhatsApp document message activities:
 * `channelData.contacts = undefined` (DISALLOWED)
 * `channelData.interactive = undefined` (DISALLOWED)
 * `channelData.location = undefined` (DISALLOWED)
+* `channelData.postback = undefined` (DISALLOWED)
 * `channelData.template = undefined` (DISALLOWED)
 * `text?: string` (OPTIONAL) - the document caption
 * `attachments: Attachment[]` (REQUIRED) - exactly one attachment is required
@@ -220,6 +224,7 @@ Properties of all supported WhatsApp image message activities:
 * `channelData.contacts = undefined` (DISALLOWED)
 * `channelData.interactive = undefined` (DISALLOWED)
 * `channelData.location = undefined` (DISALLOWED)
+* `channelData.postback = undefined` (DISALLOWED)
 * `channelData.template = undefined` (DISALLOWED)
 * `text?: string` (OPTIONAL) - the image caption
 * `attachments: Attachment[]` (REQUIRED) - exactly one attachment is required
@@ -274,6 +279,7 @@ Properties of all supported WhatsApp interactive message activities:
   object or a valid [WhatsAppInteractiveListMessage](https://api.tyntec.com/reference/conversations/current.html)
   object
 * `channelData.location = undefined` (DISALLOWED)
+* `channelData.postback = undefined` (DISALLOWED)
 * `channelData.template = undefined` (DISALLOWED)
 * `text = undefined` (DISALLOWED)
 * `attachments = undefined` (DISALLOWED)
@@ -332,6 +338,7 @@ Properties of all supported WhatsApp location message activities:
 * `channelData.interactive = undefined` (DISALLOWED)
 * `channelData.location: WhatsAppLocation` (REQUIRED) - a valid [WhatsAppLocation](https://api.tyntec.com/reference/conversations/current.html)
   object
+* `channelData.postback = undefined` (DISALLOWED)
 * `channelData.template = undefined` (DISALLOWED)
 * `text = undefined` (DISALLOWED)
 * `attachments = undefined` (DISALLOWED)
@@ -369,6 +376,57 @@ activity === {
 ```
 
 
+### WhatsApp Postback Message Activity
+
+Properties of all supported WhatsApp postback message activities:
+* `channelData: any` (REQUIRED)
+* `channelData.contentType = "postback"` (REQUIRED)
+* `channelData.contacts = undefined` (DISALLOWED)
+* `channelData.interactive = undefined` (DISALLOWED)
+* `channelData.location = undefined` (DISALLOWED)
+* `channelData.postback: any` (REQUIRED)
+* `channelData.postback.data: string` (REQUIRED) - the payload of the interactive item clicked
+* `channelData.postback.whatsapp?: any` (OPTIONAL)
+* `channelData.postback.whatsapp.description?: string` (OPTIONAL) - the description of the interactive item clicked
+* `channelData.postback.whatsapp.text?: string` (OPTIONAL) - the caption of the interactive item clicked
+* `channelData.postback.whatsapp.title?: string` (OPTIONAL) - the title of the interactive item clicked
+* `channelData.template = undefined` (DISALLOWED)
+* `text = undefined` (DISALLOWED)
+* `attachments = undefined` (DISALLOWED)
+
+A WhatsApp postback message activity example:
+
+```javascript
+activity === {
+    type: "message",
+    channelId: "whatsapp",
+    id: "77185196-664a-43ec-b14a-fe97036c697e",
+    timestamp: new Date("2019-06-26T09:41:00.000Z"),
+    from: {
+        id: "+1233423454"
+    },
+    recipient: {
+        id: "545345345"
+    },
+    conversation: {
+        id: "+1233423454",
+        isGroup: false,
+        name: "John Doe"
+    },
+    channelData: {
+        contentType: "postback",
+        postback: {
+            data: "9080923445nlkjß0_gß0923845083245dfg",
+            whatsapp: {
+                title: "Good"
+            }
+        }
+    },
+    serviceUrl: "https://api.tyntec.com/conversations/v3/messages"
+}
+```
+
+
 ### WhatsApp Sticker Message Activity
 
 Properties of all supported WhatsApp sticker message activities:
@@ -377,6 +435,7 @@ Properties of all supported WhatsApp sticker message activities:
 * `channelData.contacts = undefined` (DISALLOWED)
 * `channelData.interactive = undefined` (DISALLOWED)
 * `channelData.location = undefined` (DISALLOWED)
+* `channelData.postback = undefined` (DISALLOWED)
 * `channelData.template = undefined` (DISALLOWED)
 * `text = undefined` (DISALLOWED)
 * `attachments: Attachment[]` (REQUIRED) - exactly one attachment is required
@@ -429,6 +488,7 @@ Properties of all supported WhatsApp template message activities:
 * `channelData.contacts = undefined` (DISALLOWED)
 * `channelData.interactive = undefined` (DISALLOWED)
 * `channelData.location = undefined` (DISALLOWED)
+* `channelData.postback = undefined` (DISALLOWED)
 * `channelData.template: WhatsAppTemplate` (REQUIRED) - a valid [WhatsAppTemplate](https://api.tyntec.com/reference/conversations/current.html)
   object
 * `text = undefined` (DISALLOWED)
@@ -491,6 +551,7 @@ Properties of all supported WhatsApp text message activities:
 * `channelData.contacts = undefined` (DISALLOWED)
 * `channelData.interactive = undefined` (DISALLOWED)
 * `channelData.location = undefined` (DISALLOWED)
+* `channelData.postback = undefined` (DISALLOWED)
 * `channelData.template = undefined` (DISALLOWED)
 * `text: string` (REQUIRED)
 * `attachments = undefined` (DISALLOWED)
@@ -533,6 +594,7 @@ Properties of all supported WhatsApp video message activities:
 * `channelData.contacts = undefined` (DISALLOWED)
 * `channelData.interactive = undefined` (DISALLOWED)
 * `channelData.location = undefined` (DISALLOWED)
+* `channelData.postback = undefined` (DISALLOWED)
 * `channelData.template = undefined` (DISALLOWED)
 * `text?: string` (OPTIONAL) - the video caption
 * `attachments: Attachment[]` (REQUIRED) - exactly one attachment is required
@@ -587,6 +649,7 @@ Properties of all supported WhatsApp voice message activities:
 * `channelData.contacts = undefined` (DISALLOWED)
 * `channelData.interactive = undefined` (DISALLOWED)
 * `channelData.location = undefined` (DISALLOWED)
+* `channelData.postback = undefined` (DISALLOWED)
 * `channelData.template = undefined` (DISALLOWED)
 * `text = undefined` (DISALLOWED)
 * `attachments: Attachment[]` (REQUIRED) - exactly one attachment is required

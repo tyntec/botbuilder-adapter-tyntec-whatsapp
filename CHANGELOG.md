@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Support for processing postback messages to `TyntecWhatsAppAdapter#processActivity`.
 - A `TyntecWhatsAppAdapter#parseTyntecWebhookRequest` as a drop-in replacement for the `TyntecWhatsAppAdapter#parseTyntecWhatsAppMessageEvent`.
 ### Deprecated
 - The `TyntecWhatsAppAdapter#parseTyntecWhatsAppMessageEvent`. Use `TyntecWhatsAppAdapter#parseTyntecWebhookRequest` instead.

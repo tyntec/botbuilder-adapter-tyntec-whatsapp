@@ -10,7 +10,7 @@ export interface ITyntecAddress {
 
 export interface ITyntecAPIEvent {
     channel: string;
-    event: "MoMessage";
+    event: "MoMessage" | "MoMessage::Postback";
     from: string;
     timestamp?: string;
 }
@@ -71,10 +71,25 @@ export interface ITyntecMoContext {
 export interface ITyntecMoMessage extends ITyntecAPIEvent {
     content: ITyntecMediaMoContent | ITyntecTextMoContent | ITyntecWhatsAppContactsContent | ITyntecWhatsAppLocationContent;
     context?: ITyntecMoContext;
+    event: "MoMessage";
     groupId?: string;
     messageId: string;
     to?: string;
     whatsapp?: ITyntecWhatsapp;
+}
+
+export interface ITyntecMoMessagePostback extends ITyntecAPIEvent {
+    context?: ITyntecMoContext;
+    event: "MoMessage::Postback";
+    groupId?: string;
+    messageId: string;
+    postback: ITyntecPostBack;
+    to?: string;
+    whatsapp?: ITyntecWhatsAppPostBack;
+}
+
+export interface ITyntecPostBack {
+    data: string;
 }
 
 export interface ITyntecQuickReplyButtonComponent {
@@ -223,6 +238,12 @@ export interface ITyntecWhatsAppLocation {
 export interface ITyntecWhatsAppLocationContent {
     contentType: "location",
     location: ITyntecWhatsAppLocation
+}
+
+export interface ITyntecWhatsAppPostBack {
+    description?: string;
+    text?: string;
+    title?: string;
 }
 
 export interface ITyntecWhatsAppStickerContent {
