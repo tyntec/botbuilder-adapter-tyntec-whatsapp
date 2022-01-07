@@ -1104,7 +1104,7 @@ describe("TyntecWhatsAppAdapter", function() {
             });
         });
 
-        it("should parse an audio message event", async function() {
+        it("should parse an voice message event", async function() {
             const axiosInstance = {
                 request: async (config) => {
                     return {
