@@ -25,7 +25,7 @@ export function composeTyntecRequestConfig(method: Method, url: string, apikey: 
     };
     if (data !== undefined) {
         config.data = data.content;
-        config.headers["content-type"] = data.contentType;
+        config.headers!["content-type"] = data.contentType;
     }
     return config;
 }
