@@ -24,8 +24,14 @@ export class TyntecWhatsAppAdapter extends BotAdapter {
         this.tyntecApikey = settings.tyntecApikey;
     }
 
-    async continueConversation(reference: Partial<ConversationReference>, logic: (revocableContext: TurnContext) => Promise<void>): Promise<void> {
-        throw Error("Operation continueConversation not supported.");
+    continueConversation(reference: Partial<ConversationReference>, logic: (revocableContext: TurnContext) => Promise<void>): Promise<void> {
+        const activity: Partial<Activity> = TurnContext.applyConversationReference(
+            { type: "event", name: "continueConversation" },
+            reference,
+            true
+        );
+        const context = new TurnContext(this as any, activity);
+        return this.runMiddleware(context, logic);
     }
 
     async deleteActivity(context: TurnContext, reference: Partial<ConversationReference>): Promise<void> {
@@ -466,7 +472,7 @@ export class TyntecWhatsAppAdapter extends BotAdapter {
             let mediaResponse;
             try{
                 mediaResponse = await this.axiosInstance.request(mediaRequest);
-            } catch (e) {
+            } catch (e: any) {
                 throw new Error(`Failed to download media: ${e.response.status}: ${JSON.stringify(e.response.data)}`);
             }
 
