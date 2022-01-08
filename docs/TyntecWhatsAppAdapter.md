@@ -14,7 +14,8 @@ Methods:
 * [`public processActivity(req: WebRequest, res: WebResponse, logic: (context: TurnContext) => Promise<any>): Promise<void>`](#public-processactivityreq-webrequest-res-webresponse-logic-context-turncontext--promiseany-promisevoid)
 * [`public sendActivities(context: TurnContext, activities: Partial<Activity>[]): Promise<ResourceResponse[]>`](#public-sendactivitiescontext-turncontext-activities-partialactivity-promiseresourceresponse)
 * [`public use(...middlewares: (MiddlewareHandler | Middleware)[]): TyntecWhatsAppAdapter`](#public-usemiddlewares-middlewarehandler--middleware-tyntecwhatsappadapter)
-* [`protected parseTyntecWhatsAppMessageEvent(params: any, query: any, headers: any, body: ITyntecMoMessage): Promise<Partial<Activity>>`](#protected-parsetyntecwhatsappmessageeventreq-body-ityntecmomessage-headers-any-params-any-query-any-promisepartialactivity)
+* [`protected parseTyntecWebhookRequest(req: {body: ITyntecAPIEvent, headers: any, params: any, query: any}): Promise<Partial<Activity>>`](#protected-parsetyntecwebhookrequestreq-body-ityntecapievent-headers-any-params-any-query-any-promisepartialactivity)
+* [`protected parseTyntecWhatsAppMessageEvent(req: {body: ITyntecMoMessage, headers: any, params: any, query: any}): Promise<Partial<Activity>>`](#protected-parsetyntecwhatsappmessageeventreq-body-ityntecmomessage-headers-any-params-any-query-any-promisepartialactivity)
 
 If you want more information about bot adapters, see the [Microsoft Bot Framework SDK documentation](https://docs.microsoft.com/en-us/azure/bot-service/index-bf-sdk).
 
@@ -66,18 +67,23 @@ At the moment, only a subset of [tyntec Webhook Events](https://api.tyntec.com/r
 is supported. These are events that meet the following criteria:
 
 * The event must be a valid tyntec Webhook event.
-* The event must be a message (`body.event === "MoMessage"`, not delivery updates).
-* The event must be a WhatsApp message (`body.channel === "whatsapp"`).
-* The event must not be a group message (`body.to !== undefined && body.groupId === undefined`).
-* The event must be a text message (`body.content.contentType === "text"`),
-  an audio message (`body.content.contentType === "media" && body.content.media.type === "audio"`),
-  a contacts message (`body.content.contentType === "contacts"`),
-  a document message (`body.content.contentType === "media" && body.content.media.type === "document"`),
-  an image message (`body.content.contentType === "media" && body.content.media.type === "image"`),
-  a location message (`body.content.contentType === "location"`),
-  a sticker message (`body.content.contentType === "media" && body.content.media.type === "sticker"`),
-  a video message (`body.content.contentType === "media" && body.content.media.type === "video"`) or
-  a voice message (`body.content.contentType === "media" && body.content.media.type === "voice"`).
+* The event must be a message (`body.event === "MoMessage"`) or
+  a postback message (`body.event === "MoMessage::Postback"`).
+* In case it is a message:
+  * The message must be a WhatsApp message (`body.channel === "whatsapp"`).
+  * The message must not be a group message (`body.to !== undefined && body.groupId === undefined`).
+  * The message must be a text message (`body.content.contentType === "text"`),
+    an audio message (`body.content.contentType === "media" && body.content.media.type === "audio"`),
+    a contacts message (`body.content.contentType === "contacts"`),
+    a document message (`body.content.contentType === "media" && body.content.media.type === "document"`),
+    an image message (`body.content.contentType === "media" && body.content.media.type === "image"`),
+    a location message (`body.content.contentType === "location"`),
+    a sticker message (`body.content.contentType === "media" && body.content.media.type === "sticker"`),
+    a video message (`body.content.contentType === "media" && body.content.media.type === "video"`) or
+    a voice message (`body.content.contentType === "media" && body.content.media.type === "voice"`).
+* In case it is a postback message:
+  * The postback message must be a WhatsApp postback message (`body.channel === "whatsapp"`).
+  * The postback message must not be a group postback message (`body.to !== undefined && body.groupId === undefined`).
 
 Supported events are turned into activities that are passed to the created turn
 contexts. See [Activity.md](./Activity.md) to find out what activities may be
@@ -120,6 +126,36 @@ See [Activity.md](./Activity.md) to find out what activities may be passed to
 Adds the `middlewares` to the middleware pipeline and returns itself.
 
 
+## `protected parseTyntecWebhookRequest(req: {body: ITyntecAPIEvent, headers: any, params: any, query: any}): Promise<Partial<Activity>>`
+
+Maps the `req.params`, `req.query`, `req.headers` and `req.body` of a request
+accepted by [`processActivity`](#public-processactivityreq-webrequest-res-webresponse-logic-context-turncontext--promiseany-promisevoid)
+to the corresponding activity object.
+
+It is called by the [`public processActivity(req: WebRequest, res: WebResponse, logic: (context: TurnContext) => Promise<any>): Promise<void>`](#public-processactivityreq-webrequest-res-webresponse-logic-context-turncontext--promiseany-promisevoid)
+method.
+
+See [Activity.md](./Activity.md) to find out what activities are allowed to be
+returned.
+
+It may be overridden to add additional checks (like authorization) on the
+incoming requests. For example, the [tyntec inbound message webhook](https://www.tyntec.com/docs/docs-center-whatsapp-business-api-overview)
+can be registered with a custom header containing a user-defined bearer token.
+Then, the overriding method can check this header and throw an error if the
+token is invalid.
+
+```typescript
+class MyAdapter extends TyntecWhatsAppAdapter {
+    protected async parseTyntecWebhookRequest(req: {body: ITyntecAPIEvent, headers: any, params: any, query: any}): Promise<Partial<Activity>> {
+        if (req.headers['authorization'] !== 'Bearer mF_9.B5f-4.1JqM') {
+            throw new Error('Unauthorized');
+        }
+        return super.parseTyntecWebhookRequest(req);
+    }
+}
+```
+
+
 ## `protected parseTyntecWhatsAppMessageEvent(req: {body: ITyntecMoMessage, headers: any, params: any, query: any}): Promise<Partial<Activity>>`
 
 Maps the `req.params`, `req.query`, `req.headers` and `req.body` of a request
@@ -148,3 +184,6 @@ class MyAdapter extends TyntecWhatsAppAdapter {
     }
 }
 ```
+
+*Deprecated since 1.3.0.* Use [`protected parseTyntecWebhookRequest(req: {body: ITyntecAPIEvent, headers: any, params: any, query: any}): Promise<Partial<Activity>>`](#protected-parsetyntecwebhookrequestreq-body-ityntecapievent-headers-any-params-any-query-any-promisepartialactivity)
+instead.

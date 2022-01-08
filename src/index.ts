@@ -1,6 +1,6 @@
 import {Activity, ActivityTypes, BotAdapter, ConversationAccount, ConversationReference, ChannelAccount, ResourceResponse, TurnContext, WebRequest, WebResponse} from "botbuilder";
 import {AxiosInstance} from "axios";
-import {ITyntecMoMessage, ITyntecWhatsAppMessageRequest} from "./tyntec/messages";
+import {ITyntecAPIEvent, ITyntecMoMessage, ITyntecMoMessagePostback, ITyntecWhatsAppMessageRequest} from "./tyntec/messages";
 import {composeTyntecRequestConfig, composeTyntecSendWhatsAppMessageRequestConfig, parseTyntecSendWhatsAppMessageResponse} from "./tyntec/axios";
 
 export interface ITyntecWhatsAppAdapterSettings {
@@ -401,63 +401,67 @@ export class TyntecWhatsAppAdapter extends BotAdapter {
         throw Error(`TyntecWhatsAppAdapter: invalid input: ${activity}`);
     }
 
+    // Deprecated since version 1.3.0. Use parseTyntecWebhookRequest instead.
     protected async parseTyntecWhatsAppMessageEvent(req: {body: ITyntecMoMessage, headers: any, params: any, query: any}): Promise<Partial<Activity>> {
-        if (req.body.event !== "MoMessage") {
-            throw Error(`TyntecWhatsAppAdapter: ITyntecMoMessage.event other than MoMessage not supported: ${req.body.event}`)
+        return this.parseTyntecWebhookRequest(req);
+    }
+
+    protected async parseTyntecWebhookRequest(req: {body: ITyntecAPIEvent, headers: any, params: any, query: any}): Promise<Partial<Activity>> {
+        if (req.body.event === "MoMessage") {
+            return this.parseTyntecWebhookWhatsAppMoMessage(req.body as ITyntecMoMessage);
         }
-        if (req.body.content.contentType === "media" && (req.body.content.media.type !== "audio" && req.body.content.media.type !== "document" && req.body.content.media.type !== "image" && req.body.content.media.type !== "sticker" && req.body.content.media.type !== "video" && req.body.content.media.type !== "voice")) {
-            throw Error(`TyntecWhatsAppAdapter: ITyntecMoMessage.content.media.type other than audio, document, image, sticker and video not supported: ${req.body.content.media.type}`);
+        if (req.body.event === "MoMessage::Postback") {
+            return this.parseTyntecWebhookMoMessagePostback(req.body as ITyntecMoMessagePostback);
         }
-        if (req.body.groupId !== undefined) {
-            throw Error(`TyntecWhatsAppAdapter: ITyntecMoMessage.groupId not supported: ${req.body.groupId}`)
+        throw Error(`TyntecWhatsAppAdapter: ITyntecMoMessage.event other than MoMessage or MoMessage::Postback not supported: ${req.body.event}`)
+    }
+
+    protected async parseTyntecWebhookWhatsAppMoMessage(message: ITyntecMoMessage): Promise<Partial<Activity>> {
+        if (message.content.contentType === "media" && (message.content.media.type !== "audio" && message.content.media.type !== "document" && message.content.media.type !== "image" && message.content.media.type !== "sticker" && message.content.media.type !== "video" && message.content.media.type !== "voice")) {
+            throw Error(`TyntecWhatsAppAdapter: ITyntecMoMessage.content.media.type other than audio, document, image, sticker and video not supported: ${message.content.media.type}`);
         }
-        if (req.body.to === undefined) {
-            throw Error(`TyntecWhatsAppAdapter: ITyntecMoMessage.to is required: ${req.body.to}`)
+        if (message.groupId !== undefined) {
+            throw Error(`TyntecWhatsAppAdapter: ITyntecMoMessage.groupId not supported: ${message.groupId}`)
+        }
+        if (message.to === undefined) {
+            throw Error(`TyntecWhatsAppAdapter: ITyntecMoMessage.to is required: ${message.to}`)
         }
 
-        const tyntecSendWhatsAppMessageRequestConfig = composeTyntecSendWhatsAppMessageRequestConfig(this.tyntecApikey, {from: "example", to: "example", channel: "whatsapp", content: {contentType: "text", text: "example"}});
-
-        const conversation: Partial<ConversationAccount> = {
-            id: req.body.from,
-            isGroup: false,
-            name: req.body.whatsapp?.senderName
-        };
-        const from: Partial<ChannelAccount> = {
-            id: req.body.from,
-            name: req.body.whatsapp?.senderName
-        };
         const recipient: Partial<ChannelAccount> = {
-            id: req.body.to
+            id: message.to
         };
         const activity: Partial<Activity> = {
+            ...this.parseTyntecWebhookAPIEvent(message),
             channelData: {},
-            channelId: req.body.channel,
-            conversation: conversation as ConversationAccount,
-            from: from as ChannelAccount,
-            id: req.body.messageId,
+            id: message.messageId,
             recipient: recipient as ChannelAccount,
-            replyToId: req.body.context?.messageId,
-            serviceUrl: tyntecSendWhatsAppMessageRequestConfig.url,
-            timestamp: req.body.timestamp !== undefined ? new Date(req.body.timestamp) : undefined,
+            replyToId: message.context?.messageId,
             type: ActivityTypes.Message
         };
-        if (req.body.content.contentType === "text") {
+        if (message.whatsapp?.senderName) {
+            const conversation = activity.conversation as Partial<ConversationAccount>;
+            conversation.name = message.whatsapp?.senderName;
+
+            const from = activity.from as Partial<ChannelAccount>;
+            from.name = message.whatsapp?.senderName;
+        }
+        if (message.content.contentType === "text") {
             activity.channelData.contentType = "text";
-            activity.text = req.body.content.text;
+            activity.text = message.content.text;
             return activity;
         }
-        if (req.body.content.contentType === "contacts") {
+        if (message.content.contentType === "contacts") {
             activity.channelData.contentType = "contacts";
-            activity.channelData.contacts = req.body.content.contacts;
+            activity.channelData.contacts = message.content.contacts;
             return activity;
         }
-        if (req.body.content.contentType === "location") {
+        if (message.content.contentType === "location") {
             activity.channelData.contentType = "location";
-            activity.channelData.location = req.body.content.location;
+            activity.channelData.location = message.content.location;
             return activity;
         }
-        if (req.body.content.contentType === "media") {
-            const mediaRequest = composeTyntecRequestConfig("get", req.body.content.media.url, this.tyntecApikey, "*/*");
+        if (message.content.contentType === "media") {
+            const mediaRequest = composeTyntecRequestConfig("get", message.content.media.url, this.tyntecApikey, "*/*");
             mediaRequest.validateStatus = () => true;
             let mediaResponse;
             try{
@@ -469,13 +473,66 @@ export class TyntecWhatsAppAdapter extends BotAdapter {
             activity.attachments = [
                 {
                     contentType: mediaResponse.headers["content-type"],
-                    contentUrl: req.body.content.media.url
+                    contentUrl: message.content.media.url
                 }
             ];
-            activity.channelData.contentType = req.body.content.media.type;
-            activity.text = req.body.content.media.caption;
+            activity.channelData.contentType = message.content.media.type;
+            activity.text = message.content.media.caption;
             return activity;
         }
-        throw Error(`TyntecWhatsAppAdapter: invalid input: ${JSON.stringify(req.body)}`);
+        throw Error(`TyntecWhatsAppAdapter: invalid input: ${JSON.stringify(message)}`);
+    }
+
+    protected async parseTyntecWebhookMoMessagePostback(message: ITyntecMoMessagePostback): Promise<Partial<Activity>> {
+        if (message.groupId !== undefined) {
+            throw Error(`TyntecWhatsAppAdapter: ITyntecMoMessage.groupId not supported: ${message.groupId}`)
+        }
+        if (message.to === undefined) {
+            throw Error(`TyntecWhatsAppAdapter: ITyntecMoMessage.to is required: ${message.to}`)
+        }
+
+        const recipient: Partial<ChannelAccount> = {
+            id: message.to
+        };
+        const activity: Partial<Activity> = {
+            ...this.parseTyntecWebhookAPIEvent(message),
+            channelData: {
+                contentType: "postback",
+                postback: {
+                    data: message.postback.data
+                }
+            },
+            id: message.messageId,
+            recipient: recipient as ChannelAccount,
+            replyToId: message.context?.messageId,
+            type: ActivityTypes.Message
+        };
+        if (message.whatsapp) {
+            activity.channelData.postback.whatsapp = {
+                description: message.whatsapp.description,
+                text: message.whatsapp.text,
+                title: message.whatsapp.title
+            }
+        }
+        return activity;
+    }
+
+    protected parseTyntecWebhookAPIEvent(event: ITyntecAPIEvent): Partial<Activity> {
+        const tyntecSendWhatsAppMessageRequestConfig = composeTyntecSendWhatsAppMessageRequestConfig(this.tyntecApikey, {from: "example", to: "example", channel: "whatsapp", content: {contentType: "text", text: "example"}});
+
+        const conversation: Partial<ConversationAccount> = {
+            id: event.from,
+            isGroup: false
+        };
+        const from: Partial<ChannelAccount> = {
+            id: event.from
+        };
+        return {
+            channelId: event.channel,
+            conversation: conversation as ConversationAccount,
+            from: from as ChannelAccount,
+            serviceUrl: tyntecSendWhatsAppMessageRequestConfig.url,
+            timestamp: event.timestamp !== undefined ? new Date(event.timestamp) : undefined
+        };
     }
 }
