@@ -30,7 +30,7 @@ Properties of all supported WhatsApp message activities:
 * `textFormat?: TextFormatTypes` (IGNORED)
 * `locale?: string` (IGNORED)
 * `speak = undefined` (DISALLOWED)
-* `inputHint = undefined` (DISALLOWED)
+* `inputHint?: string` (IGNORED)
 * `attachmentLayout?: AttachmentLayoutTypes` (IGNORED)
 * `suggestedActions?: SuggestedActions` (IGNORED)
 * `expiration?: Date` (IGNORED)
@@ -546,8 +546,8 @@ activity === {
 ### WhatsApp Text Message Activity
 
 Properties of all supported WhatsApp text message activities:
-* `channelData: any` (REQUIRED)
-* `channelData.contentType = "text"` (REQUIRED)
+* `channelData?: any` (OPTIONAL)
+* `channelData.contentType = "text"` (OPTIONAL)
 * `channelData.contacts = undefined` (DISALLOWED)
 * `channelData.interactive = undefined` (DISALLOWED)
 * `channelData.location = undefined` (DISALLOWED)
